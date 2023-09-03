@@ -1,8 +1,4 @@
-﻿#if !UNITY_WEBGL
-#define MICROPHONE_AVAILABLE
-#endif
-
-#if UNITY_WEBGL && !UNITY_EDITOR
+﻿#if UNITY_WEBGL && !UNITY_EDITOR
 #define WEB_MODE //different to UNITY_WEBGL, as we still want functionality in the Editor!
 #endif
 
@@ -13,6 +9,16 @@ namespace Spectrum
 
 	public static class SimpleSpectrumApi
 	{
+
+		public static int SetFFTSize(int numSamples)
+		{
+			numSamples = Mathf.ClosestPowerOfTwo(numSamples);
+
+#if WEB_MODE
+        numSamples = SSWebInteract.SetFFTSize(numSamples);
+#endif
+			return numSamples;
+		}
 
 		public static float GetLoudness(float[] samples, int channel)
 		{

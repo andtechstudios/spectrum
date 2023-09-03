@@ -304,7 +304,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 1
@@ -605,6 +605,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a89cc0571b78ef4588b77cdfc1fa542, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  scaler: {fileID: 1875067159}
   clipOverride: {fileID: 8300000, guid: ed8861bf68294a643b78b817eaeba453, type: 3}
   audioSource: {fileID: 1073279696}
   barManager: {fileID: 1561388118}
@@ -616,7 +617,7 @@ MonoBehaviour:
   multiplyByFrequency: 1
   frequencyLimitLow: 10
   frequencyLimitHigh: 11025
-  loudnessDecaySpeed: 2
+  loudnessDecaySpeed: 0.5
   bandDecaySpeed: 4
   songInfoText: {fileID: 123838653}
   logoTransform: {fileID: 1875067156}

@@ -1,11 +1,8 @@
 using System;
 using System.Collections;
-using System.Runtime.InteropServices;
-using System.Security.Policy;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
-using static UnityEngine.EventSystems.EventTrigger;
 
 namespace Spectrum
 {
@@ -14,6 +11,7 @@ namespace Spectrum
 	{
 		public static Program Instance { get; private set; }
 
+		public bool IsAudioAllowed { get; private set; } = false;
 		public float Loudness { get; private set; }
 
 		[Header("Program Settings")]
@@ -63,6 +61,7 @@ namespace Spectrum
 		// Storage
 		private Config config;
 		private Sampler sampler;
+		private float[] loudnessBuffer = new float[256];
 
 		private void OnEnable()
 		{
@@ -75,13 +74,6 @@ namespace Spectrum
 
 		private IEnumerator Start()
 		{
-			songInfoText.color = Color.clear;
-
-			yield return DoConfig();
-
-			songInfoText.text = $"{config.artist}\n\"{config.title}\"\nSpooky Tune Jam 2023";
-
-			yield return DoAudio();
 			sampler = new Sampler(NumSamples, numBands)
 			{
 				DecaySpeed = bandDecaySpeed,
@@ -90,15 +82,27 @@ namespace Spectrum
 				MultiplyByFrequency = multiplyByFrequency,
 				UseLogarithmicFrequency = useLogarithmicFrequency,
 			};
+			songInfoText.color = Color.clear;
+
+			yield return DoConfig();
+
+			songInfoText.text = $"{config.artist}\n\"{config.title}\"\nSpooky Tune Jam 2023";
+
+			yield return DoAudio();
 			barManager.Init(sampler);
-			yield break;
 			StartCoroutine(FadeInChryon());
 
 		}
 
 		private void FixedUpdate()
 		{
-			//Loudness = SimpleSpectrumApi.GetLoudness(loudnessBuffer, 0);
+			Loudness = Mathf.Max(SimpleSpectrumApi.GetLoudness(loudnessBuffer, 0), Loudness);
+
+#if UNITY_WEBGL
+			IsAudioAllowed = IsAudioAllowed || Loudness > Mathf.Epsilon;
+#else
+			IsAudioAllowed = true;
+#endif
 			sampler?.OnFixedUpdate();
 		}
 		private void Update()
@@ -115,7 +119,7 @@ namespace Spectrum
 			// Wait for browser to allow audio
 			do
 			{
-				if (Loudness > Mathf.Epsilon)
+				if (IsAudioAllowed)
 				{
 					break;
 				}

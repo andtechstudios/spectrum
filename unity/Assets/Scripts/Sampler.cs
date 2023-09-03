@@ -50,16 +50,14 @@ namespace Spectrum
 		private float frequencyLimitLow = 10f;
 		private float frequencyLimitHigh = 11025f;
 		private float decaySpeed = 4f;
+		private float idleSpinSpeed = 0f;
 
 		float[] spectrum;
 		float highestLogFreq, frequencyScaleFactor;
 
 		public Sampler(int numSamples, int numBands)
 		{
-			numSamples = Mathf.ClosestPowerOfTwo(numSamples);
-#if WEB_MODE
-      numSamples = SSWebInteract.SetFFTSize(numSamples);
-#endif
+			numSamples = SimpleSpectrumApi.SetFFTSize(numSamples);
 
 			//initialise arrays
 			spectrum = new float[numSamples];
@@ -70,72 +68,103 @@ namespace Spectrum
 
 		public void OnFixedUpdate()
 		{
-			SimpleSpectrumApi.GetSpectrumData(spectrum, (int)Program.Instance.SamplingChannel, Program.Instance.SamplingWindow);
+			if (Program.Instance.IsAudioAllowed)
+			{
+				SimpleSpectrumApi.GetSpectrumData(spectrum, (int)Program.Instance.SamplingChannel, Program.Instance.SamplingWindow);
 
 #if WEB_MODE
       float freqLim = frequencyLimitHigh * 0.76f; //AnalyserNode.getFloatFrequencyData doesn't fill the array, for some reason
 #else
-			float freqLim = FrequencyLimitHigh;
+				float freqLim = FrequencyLimitHigh;
 #endif
 
-			for (int i = 0; i < NumBands; i++)
-			{
-				float sample;
-				float trueSampleIndex;
-
-				//GET SAMPLES
-				if (UseLogarithmicFrequency)
+				for (int i = 0; i < NumBands; i++)
 				{
-					//LOGARITHMIC FREQUENCY SAMPLING
+					float sample;
+					float trueSampleIndex;
 
-					//trueSampleIndex = highFrequencyTrim * (highestLogFreq - Mathf.Log(barAmount + 1 - i, 2)) * logFreqMultiplier; //old version
+					//GET SAMPLES
+					if (UseLogarithmicFrequency)
+					{
+						//LOGARITHMIC FREQUENCY SAMPLING
 
-					trueSampleIndex = Mathf.Lerp(FrequencyLimitLow, freqLim, (highestLogFreq - Mathf.Log(NumBands + 1 - i, 2)) / highestLogFreq) * frequencyScaleFactor;
+						//trueSampleIndex = highFrequencyTrim * (highestLogFreq - Mathf.Log(barAmount + 1 - i, 2)) * logFreqMultiplier; //old version
 
-					//'logarithmic frequencies' just means we want to bias to the lower frequencies.
-					//by doing log2(max(i)) - log2(max(i) - i), we get a flipped log graph
-					//(make a graph of log2(64)-log2(64-x) to see what I mean)
-					//this isn't finished though, because that graph doesn't actually map the bar index (x) to the spectrum index (y).
-					//then we divide by highestLogFreq to make the graph to map 0-barAmount on the x axis to 0-1 in the y axis.
-					//we then use this to Lerp between frequency limits, and then an index is calculated.
-					//also 1 gets added to barAmount pretty much everywhere, because without it, the log hits (barAmount-1,max(freq))
+						trueSampleIndex = Mathf.Lerp(FrequencyLimitLow, freqLim, (highestLogFreq - Mathf.Log(NumBands + 1 - i, 2)) / highestLogFreq) * frequencyScaleFactor;
 
-				}
-				else
-				{
-					//LINEAR (SCALED) FREQUENCY SAMPLING 
-					//trueSampleIndex = i * linearSampleStretch; //don't like this anymore
+						//'logarithmic frequencies' just means we want to bias to the lower frequencies.
+						//by doing log2(max(i)) - log2(max(i) - i), we get a flipped log graph
+						//(make a graph of log2(64)-log2(64-x) to see what I mean)
+						//this isn't finished though, because that graph doesn't actually map the bar index (x) to the spectrum index (y).
+						//then we divide by highestLogFreq to make the graph to map 0-barAmount on the x axis to 0-1 in the y axis.
+						//we then use this to Lerp between frequency limits, and then an index is calculated.
+						//also 1 gets added to barAmount pretty much everywhere, because without it, the log hits (barAmount-1,max(freq))
 
-					trueSampleIndex = Mathf.Lerp(FrequencyLimitLow, freqLim, ((float)i) / NumBands) * frequencyScaleFactor;
-					//sooooo this one's gotten fancier...
-					//firstly a lerp is used between frequency limits to get the 'desired frequency', then it's divided by the outputSampleRate (/2, who knows why) to get its location in the array, then multiplied by numSamples to get an index instead of a fraction.
+					}
+					else
+					{
+						//LINEAR (SCALED) FREQUENCY SAMPLING 
+						//trueSampleIndex = i * linearSampleStretch; //don't like this anymore
 
-				}
+						trueSampleIndex = Mathf.Lerp(FrequencyLimitLow, freqLim, ((float)i) / NumBands) * frequencyScaleFactor;
+						//sooooo this one's gotten fancier...
+						//firstly a lerp is used between frequency limits to get the 'desired frequency', then it's divided by the outputSampleRate (/2, who knows why) to get its location in the array, then multiplied by numSamples to get an index instead of a fraction.
 
-				//the true sample is usually a decimal, so we need to lerp between the floor and ceiling of it.
+					}
 
-				int sampleIndexFloor = Mathf.FloorToInt(trueSampleIndex);
-				sampleIndexFloor = Mathf.Clamp(sampleIndexFloor, 0, spectrum.Length - 2); //just keeping it within the spectrum array's range
+					//the true sample is usually a decimal, so we need to lerp between the floor and ceiling of it.
 
-				sample = Mathf.SmoothStep(spectrum[sampleIndexFloor], spectrum[sampleIndexFloor + 1], trueSampleIndex - sampleIndexFloor); //smoothly interpolate between the two samples using the true index's decimal.
+					int sampleIndexFloor = Mathf.FloorToInt(trueSampleIndex);
+					sampleIndexFloor = Mathf.Clamp(sampleIndexFloor, 0, spectrum.Length - 2); //just keeping it within the spectrum array's range
 
-				//MANIPULATE & APPLY SAMPLES
-				if (MultiplyByFrequency) //multiplies the amplitude by the true sample index
-				{
+					sample = Mathf.SmoothStep(spectrum[sampleIndexFloor], spectrum[sampleIndexFloor + 1], trueSampleIndex - sampleIndexFloor); //smoothly interpolate between the two samples using the true index's decimal.
+
+					//MANIPULATE & APPLY SAMPLES
+					if (MultiplyByFrequency) //multiplies the amplitude by the true sample index
+					{
 #if WEB_MODE
             sample = sample * (Mathf.Log(trueSampleIndex + 1) + 1);  //different due to how the WebAudioAPI outputs spectrum data.
 
 #else
-					sample = sample * (trueSampleIndex + 1);
+						sample = sample * (trueSampleIndex + 1);
 #endif
-				}
+					}
 #if !WEB_MODE
-				sample = Mathf.Sqrt(sample); //compress the amplitude values by sqrt(x)
+					sample = Mathf.Sqrt(sample); //compress the amplitude values by sqrt(x)
 #endif
 
-				//DAMPENING
+					//DAMPENING
 
-				Bands[i] = Mathf.Max(sample, Bands[i]);
+					Bands[i] = Mathf.Max(sample, Bands[i]);
+				}
+			}
+			else
+			{
+				idleSpinSpeed = 120f;
+				var slowCursorAngle = Mathf.Repeat(idleSpinSpeed * Time.time, 360f);
+				var fastCursorAngle = Mathf.Repeat(2 * idleSpinSpeed * Time.time, 360f);
+
+				for (int i = 0; i < NumBands; i++)
+				{
+					var percent = (float)i / NumBands;
+					var angle = percent * 360f;
+
+					DoBand(slowCursorAngle, 40f, 0f, 0.3f);
+					DoBand(slowCursorAngle, 40f, 180f, 0.3f);
+					DoBand(fastCursorAngle, 15f, 90f, 0.8f);
+					DoBand(fastCursorAngle, 15f, 270f, 0.6f);
+
+					void DoBand(float cursor, float width, float offset, float scale)
+					{
+						var angleDiff = Mathf.DeltaAngle(angle + offset, cursor);
+						var band = 1f - Mathf.InverseLerp(0f, width, Mathf.Abs(angleDiff));
+						Bands[i] = Mathf.Max(scale * band, Bands[i]);
+					}
+				}
+				for (int i = 0; i < NumBands; i++)
+				{
+					Bands[i] = Mathf.Clamp01(Bands[i]);
+				}
 			}
 		}
 
