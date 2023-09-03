@@ -3,6 +3,7 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.UI;
 
 namespace Spectrum
 {
@@ -57,6 +58,8 @@ namespace Spectrum
 		private TMP_Text songInfoText;
 		[SerializeField]
 		private RectTransform logoTransform;
+		[SerializeField]
+		private Graphic playGraphic;
 
 		// Storage
 		private Config config;
@@ -82,7 +85,8 @@ namespace Spectrum
 				MultiplyByFrequency = multiplyByFrequency,
 				UseLogarithmicFrequency = useLogarithmicFrequency,
 			};
-			songInfoText.color = Color.clear;
+
+			PresetUI();
 
 			yield return DoConfig();
 
@@ -99,11 +103,13 @@ namespace Spectrum
 			Loudness = Mathf.Max(SimpleSpectrumApi.GetLoudness(loudnessBuffer, 0), Loudness);
 
 #if UNITY_WEBGL
-			IsAudioAllowed = IsAudioAllowed || Loudness > Mathf.Epsilon;
+			IsAudioAllowed = IsAudioAllowed || Loudness > 0.1f;
 #else
 			IsAudioAllowed = true;
 #endif
 			sampler?.OnFixedUpdate();
+
+			playGraphic.enabled = !IsAudioAllowed;
 		}
 		private void Update()
 		{
@@ -111,6 +117,11 @@ namespace Spectrum
 			sampler?.OnUpdate();
 		}
 
+		void PresetUI()
+		{
+			songInfoText.color = Color.clear;
+			playGraphic.enabled = false;
+		}
 		IEnumerator FadeInChryon()
 		{
 			var delay = 2f;
