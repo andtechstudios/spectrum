@@ -15,6 +15,8 @@ namespace App
 		public AudioClip clipOverride;
 		[SerializeField]
 		private AudioSource audioSource;
+		[SerializeField]
+		private AudioListener audioListener;
 
 		[Header("Spectrum Settings")]
 		[SerializeField]
@@ -157,7 +159,7 @@ namespace App
 		{
 			if (audioSource.clip)
 			{
-				audioSource.GetSpectrumData(spectrum, 0, window);
+				AudioListener.GetSpectrumData(spectrum, 0, window);
 
 				var candidateBands = new float[spectrum.Length];
 				var energy = 0f;

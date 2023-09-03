@@ -1,0 +1,31 @@
+fileFormatVersion: 2
+guid: 33cdac0f80b7cd346b21a771772f4a7e
+timeCreated: 1544467288
+licenseType: Store
+PluginImporter:
+  serializedVersion: 1
+  iconMap: {}
+  executionOrder: {}
+  isPreloaded: 0
+  isOverridable: 0
+  platformData:
+    Any:
+      enabled: 0
+      settings: {}
+    Editor:
+      enabled: 0
+      settings:
+        DefaultValueInitialized: true
+    WebGL:
+      enabled: 1
+      settings: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 85294
+  packageName: SimpleSpectrum - Free Audio Spectrum Generator (+WebGL!)
+  packageVersion: 2.1
+  assetPath: Assets/SimpleSpectrum/Scripts/SimpleSpectrumWeb.jslib
+  uploadId: 282897

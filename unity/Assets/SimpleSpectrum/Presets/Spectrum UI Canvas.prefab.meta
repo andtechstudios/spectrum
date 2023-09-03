@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 74cd4c7a297aa674d8568954593167d3
+timeCreated: 1520072685
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 85294
+  packageName: SimpleSpectrum - Free Audio Spectrum Generator (+WebGL!)
+  packageVersion: 2.1
+  assetPath: Assets/SimpleSpectrum/Presets/Spectrum UI Canvas.prefab
+  uploadId: 282897

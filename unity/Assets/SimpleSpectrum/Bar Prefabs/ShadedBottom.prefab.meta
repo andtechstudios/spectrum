@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 549acde3f08d4c847b99f05626823864
+timeCreated: 1488713326
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 85294
+  packageName: SimpleSpectrum - Free Audio Spectrum Generator (+WebGL!)
+  packageVersion: 2.1
+  assetPath: Assets/SimpleSpectrum/Bar Prefabs/ShadedBottom.prefab
+  uploadId: 282897

@@ -158,5 +158,6 @@
       
       document.onfullscreenchange = rebuildFullscreenGUI;
     </script>
+    <script>window.SimpleSpectrum={};window.AudioContext=(function(){var q=window.AudioContext||window.webkitAudioContext;return function(){var ac=new q();window.SimpleSpectrum.ac=ac;window.SimpleSpectrum.a=ac.createAnalyser();window.SimpleSpectrum.a.smoothingTimeConstant=0;window.SimpleSpectrum.fa=new Uint8Array(window.SimpleSpectrum.a.frequencyBinCount);window.SimpleSpectrum.la=new Uint8Array(window.SimpleSpectrum.a.fftSize);window.SimpleSpectrum.a.connect(ac.destination);ac.actualDestination=ac.destination;Object.defineProperty(ac,'destination',{value:window.SimpleSpectrum.a,writable:false});return ac;}})();</script>
   </body>
 </html>

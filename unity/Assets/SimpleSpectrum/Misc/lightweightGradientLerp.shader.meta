@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: df203e2741d36ea469cba3374dc8d8fe
+timeCreated: 1489238131
+licenseType: Store
+ShaderImporter:
+  defaultTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 85294
+  packageName: SimpleSpectrum - Free Audio Spectrum Generator (+WebGL!)
+  packageVersion: 2.1
+  assetPath: Assets/SimpleSpectrum/Misc/lightweightGradientLerp.shader
+  uploadId: 282897

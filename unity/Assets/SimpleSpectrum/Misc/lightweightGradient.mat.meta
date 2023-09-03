@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: ffbc5f27e5c02e345bbbfe8fb9ea0c01
+timeCreated: 1489238424
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 85294
+  packageName: SimpleSpectrum - Free Audio Spectrum Generator (+WebGL!)
+  packageVersion: 2.1
+  assetPath: Assets/SimpleSpectrum/Misc/lightweightGradient.mat
+  uploadId: 282897

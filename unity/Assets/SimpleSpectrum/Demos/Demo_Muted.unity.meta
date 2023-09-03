@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 4ec0cdffdd23f8445955f3dcec42c324
+timeCreated: 1520085043
+licenseType: Store
+DefaultImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 85294
+  packageName: SimpleSpectrum - Free Audio Spectrum Generator (+WebGL!)
+  packageVersion: 2.1
+  assetPath: Assets/SimpleSpectrum/Demos/Demo_Muted.unity
+  uploadId: 282897

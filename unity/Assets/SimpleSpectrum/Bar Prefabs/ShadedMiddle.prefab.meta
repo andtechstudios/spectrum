@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: d047a0eb18ba2e34e89e5512e058eee6
+timeCreated: 1488713329
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 85294
+  packageName: SimpleSpectrum - Free Audio Spectrum Generator (+WebGL!)
+  packageVersion: 2.1
+  assetPath: Assets/SimpleSpectrum/Bar Prefabs/ShadedMiddle.prefab
+  uploadId: 282897

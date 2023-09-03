@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 449fbf707e8efbb499710e90b6acc107
+timeCreated: 1489237817
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 85294
+  packageName: SimpleSpectrum - Free Audio Spectrum Generator (+WebGL!)
+  packageVersion: 2.1
+  assetPath: Assets/SimpleSpectrum/Bar Prefabs/SpriteBottom.prefab
+  uploadId: 282897

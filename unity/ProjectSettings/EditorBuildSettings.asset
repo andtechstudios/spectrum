@@ -5,8 +5,14 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Main.unity
     guid: 59c6be64743e6b7478c8c791f287cd31
+  - enabled: 0
+    path: Assets/SimpleSpectrum/Demos/Demo_Main.unity
+    guid: ef15545280b1cad4fbf2aa7b9450a083
+  - enabled: 1
+    path: Assets/Main2.unity
+    guid: f11b857e8684d814eb1b3d3d556078d4
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0

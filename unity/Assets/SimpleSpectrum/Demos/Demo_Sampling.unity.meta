@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: c71a3ae6e6cf4774ca436d128af07863
+timeCreated: 1520085043
+licenseType: Store
+DefaultImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 85294
+  packageName: SimpleSpectrum - Free Audio Spectrum Generator (+WebGL!)
+  packageVersion: 2.1
+  assetPath: Assets/SimpleSpectrum/Demos/Demo_Sampling.unity
+  uploadId: 282897

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 9b64f430ff73992418303a1687e0b1d5
+timeCreated: 1520071571
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 85294
+  packageName: SimpleSpectrum - Free Audio Spectrum Generator (+WebGL!)
+  packageVersion: 2.1
+  assetPath: Assets/SimpleSpectrum/Bar Prefabs/UIMiddle.prefab
+  uploadId: 282897
