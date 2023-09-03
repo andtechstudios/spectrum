@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace App
+namespace Spectrum
 {
 
 	public class SpectrumWidget : MonoBehaviour

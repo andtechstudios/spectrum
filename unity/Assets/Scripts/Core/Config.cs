@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace App
+namespace Spectrum
 {
 	[Serializable]
 	public class Config

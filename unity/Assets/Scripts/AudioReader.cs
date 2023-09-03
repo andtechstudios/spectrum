@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.Networking;
 
-namespace App
+namespace Spectrum
 {
 	public class AudioReader
 	{

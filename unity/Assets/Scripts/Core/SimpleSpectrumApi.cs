@@ -8,7 +8,7 @@
 
 using UnityEngine;
 
-namespace App
+namespace Spectrum
 {
 
 	public static class SimpleSpectrumApi

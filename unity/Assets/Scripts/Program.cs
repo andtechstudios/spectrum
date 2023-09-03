@@ -5,22 +5,16 @@ using System.Security.Policy;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
+using static UnityEngine.EventSystems.EventTrigger;
 
-namespace App
+namespace Spectrum
 {
-
-	public enum SampleChannel
-	{
-		PingPong = -1,
-		Left = 0,
-		Right = 1,
-	}
 
 	public class Program : MonoBehaviour
 	{
 		public static Program Instance { get; private set; }
 
-		public BarManager barManager;
+		public float Loudness { get; private set; }
 
 		[Header("Program Settings")]
 		[SerializeField]
@@ -29,23 +23,36 @@ namespace App
 		[SerializeField]
 		private AudioSource audioSource;
 		[SerializeField]
-		private AudioListener audioListener;
+		private BarManager barManager;
 
-		public int SamplingCount => 1 << samplingSizeFactor;
-		[Header("Spectrum Settings")]
+		public int NumSamples => 1 << numSamplesFactor;
+		[Header("Sampling Settings")]
 		[SerializeField]
 		[Range(6f, 12f)]
-		private int samplingSizeFactor = 10;
-		public int BandCount => bandCount;
+		private int numSamplesFactor = 10;
+		public int NumBands => numBands;
 		[SerializeField]
 		[Range(32, 100)]
-		private int bandCount = 64;
+		private int numBands = 64;
 		public FFTWindow SamplingWindow => samplingWindow;
 		[SerializeField]
 		private FFTWindow samplingWindow = FFTWindow.Rectangular;
 		public SampleChannel SamplingChannel => samplingChannel;
 		[SerializeField]
 		private SampleChannel samplingChannel = SampleChannel.Left;
+		[Space]
+		[Tooltip("If true, audio data is scaled logarithmically.")]
+		public bool useLogarithmicFrequency = true;
+		[Tooltip("If true, the values of the spectrum are multiplied based on their frequency, to keep the values proportionate.")]
+		public bool multiplyByFrequency = true;
+		[Tooltip("The lower bound of the freuqnecy range to sample from. Leave at 0 when unused.")]
+		public float frequencyLimitLow = 10;
+		[Tooltip("The upper bound of the freuqnecy range to sample from. Leave at 22050 (44100/2) when unused.")]
+		public float frequencyLimitHigh = 11025;
+		[Tooltip("How quickly loudness decay over time.")]
+		public float loudnessDecaySpeed = 2;
+		[Tooltip("How quickly bands decay over time.")]
+		public float bandDecaySpeed = 4;
 
 		[Header("UI Settings")]
 		[SerializeField]
@@ -56,13 +63,18 @@ namespace App
 
 		// Storage
 		private Config config;
-		private float[] samples = new float[256];
+		private Sampler sampler;
+		private float[] loudnessBuffer;
+
+		private void Awake()
+		{
+			loudnessBuffer = new float[4];
+		}
 
 		private void OnEnable()
 		{
 			Instance = Instance ? Instance : this;
 		}
-
 		private void OnDisable()
 		{
 			Instance = Instance == this ? null : Instance;
@@ -77,14 +89,32 @@ namespace App
 			songInfoText.text = $"{config.artist}\n\"{config.title}\"\nSpooky Tune Jam 2023";
 
 			yield return DoAudio();
+			sampler = new Sampler(NumSamples, numBands)
+			{
+				DecaySpeed = bandDecaySpeed,
+				FrequencyLimitHigh = frequencyLimitHigh,
+				FrequencyLimitLow = frequencyLimitLow,
+				MultiplyByFrequency = multiplyByFrequency,
+				UseLogarithmicFrequency = useLogarithmicFrequency,
+			};
+			barManager.Init(sampler);
+			StartCoroutine(FadeInChryon());
+			yield break;
 
-
-			StartCoroutine(FadeIn());
-
-			//yield return DoUI();
 		}
 
-		IEnumerator FadeIn()
+		private void FixedUpdate()
+		{
+			//Loudness = SimpleSpectrumApi.GetLoudness(loudnessBuffer, 0);
+			sampler?.OnFixedUpdate();
+		}
+		private void Update()
+		{
+			Loudness = Mathf.Max(Loudness - Time.deltaTime * loudnessDecaySpeed, 0f);
+			sampler?.OnUpdate();
+		}
+
+		IEnumerator FadeInChryon()
 		{
 			var delay = 2f;
 			var fadeDuration = 3f;
@@ -92,7 +122,7 @@ namespace App
 			// Wait for browser to allow audio
 			do
 			{
-				if (SimpleSpectrumApi.GetLoudness(samples, 0) > Mathf.Epsilon)
+				if (Loudness > Mathf.Epsilon)
 				{
 					break;
 				}
@@ -173,13 +203,6 @@ namespace App
 			{
 				Debug.LogError("Couldn't locate audio file: audio.flac, audio.wav, audio.mp3");
 			}
-		}
-
-		IEnumerator DoUI()
-		{
-			spectrumWidget.Init(bandCount);
-
-			yield break;
 		}
 	}
 }
