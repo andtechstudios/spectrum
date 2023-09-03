@@ -11,10 +11,7 @@ SimpleSpectrum.cs - Part of Simple Spectrum V2.1 by Sam Boyer.
 #endif
 
 using App;
-using NUnit.Framework.Constraints;
 using UnityEngine;
-using UnityEngine.Audio;
-using UnityEngine.UI;
 
 public class BarManager : MonoBehaviour
 {
@@ -79,7 +76,7 @@ public class BarManager : MonoBehaviour
 	/// The amount of bars to use.
 	/// </summary>
 	[Tooltip("The amount of bars to use. Does not have to be equal to Num Samples, but probably should be lower.")]
-	public int barAmount = 32;
+	public int bandCount = 32;
 	/// <summary>
 	/// Stretches the values of the bars.
 	/// </summary>
@@ -115,6 +112,7 @@ public class BarManager : MonoBehaviour
 	[Range(0, 1)]
 	[Tooltip("The amount of dampening used when the new scale is lower than the bar's existing scale.")]
 	public float decayDamp = 0.15f;
+	public float decaySpeed;
 	#endregion
 
 	#region COLOR PROPERTIES
@@ -160,6 +158,7 @@ public class BarManager : MonoBehaviour
 
 	float[] spectrum;
 	float[] oldYScales; //also optimisation
+	float[] bands;
 	float highestLogFreq, frequencyScaleFactor; //multiplier to ensure that the frequencies stretch to the highest record in the array.
 	Bar[] bars;
 
@@ -180,92 +179,114 @@ public class BarManager : MonoBehaviour
 
 		//initialise arrays
 		spectrum = new float[numSamples];
-		bars = new Bar[barAmount];
-		oldYScales = new float[barAmount];
-		highestLogFreq = Mathf.Log(barAmount + 1, 2); //gets the highest possible logged frequency, used to calculate which sample of the spectrum to use for a bar
+		oldYScales = new float[bandCount];
+		bands = new float[bandCount];
+		highestLogFreq = Mathf.Log(bandCount + 1, 2); //gets the highest possible logged frequency, used to calculate which sample of the spectrum to use for a bar
 		frequencyScaleFactor = 1.0f / (AudioSettings.outputSampleRate / 2) * numSamples;
+		bars = new Bar[bandCount];
 
 		//bar instantiation loop
-		for (int i = 0; i < barAmount; i++)
+		for (int i = 0; i < bandCount; i++)
 		{
 			var bar = Instantiate(barPrefab, barsFolder); //create the bars and assign the parent
-			bar.transform.localEulerAngles = new Vector3(0f, 0f, -(float)i / barAmount * 360f);
+			bar.transform.localEulerAngles = new Vector3(0f, 0f, -(float)i / bandCount * 360f);
 
 			bars[i] = bar;
 		}
 	}
 
-	void Update()
+	private void FixedUpdate()
 	{
-		if (Program.Instance)
-		{
-			SimpleSpectrumApi.GetSpectrumData(spectrum, sampleChannel, windowUsed);
+		OnFixedUpdate();
+	}
+	private void Update()
+	{
+		OnUpdate();
+	}
+
+	public void OnFixedUpdate()
+	{
+		SimpleSpectrumApi.GetSpectrumData(spectrum, sampleChannel, windowUsed);
 
 #if WEB_MODE
       float freqLim = frequencyLimitHigh * 0.76f; //AnalyserNode.getFloatFrequencyData doesn't fill the array, for some reason
 #else
-			float freqLim = frequencyLimitHigh;
+		float freqLim = frequencyLimitHigh;
 #endif
 
-			for (int i = 0; i < bars.Length; i++)
+		for (int i = 0; i < bars.Length; i++)
+		{
+			float sample;
+			float trueSampleIndex;
+
+			//GET SAMPLES
+			if (useLogarithmicFrequency)
 			{
-				Bar bar = bars[i];
+				//LOGARITHMIC FREQUENCY SAMPLING
 
-				float value;
-				float trueSampleIndex;
+				//trueSampleIndex = highFrequencyTrim * (highestLogFreq - Mathf.Log(barAmount + 1 - i, 2)) * logFreqMultiplier; //old version
 
-				//GET SAMPLES
-				if (useLogarithmicFrequency)
-				{
-					//LOGARITHMIC FREQUENCY SAMPLING
+				trueSampleIndex = Mathf.Lerp(frequencyLimitLow, freqLim, (highestLogFreq - Mathf.Log(bandCount + 1 - i, 2)) / highestLogFreq) * frequencyScaleFactor;
 
-					//trueSampleIndex = highFrequencyTrim * (highestLogFreq - Mathf.Log(barAmount + 1 - i, 2)) * logFreqMultiplier; //old version
+				//'logarithmic frequencies' just means we want to bias to the lower frequencies.
+				//by doing log2(max(i)) - log2(max(i) - i), we get a flipped log graph
+				//(make a graph of log2(64)-log2(64-x) to see what I mean)
+				//this isn't finished though, because that graph doesn't actually map the bar index (x) to the spectrum index (y).
+				//then we divide by highestLogFreq to make the graph to map 0-barAmount on the x axis to 0-1 in the y axis.
+				//we then use this to Lerp between frequency limits, and then an index is calculated.
+				//also 1 gets added to barAmount pretty much everywhere, because without it, the log hits (barAmount-1,max(freq))
 
-					trueSampleIndex = Mathf.Lerp(frequencyLimitLow, freqLim, (highestLogFreq - Mathf.Log(barAmount + 1 - i, 2)) / highestLogFreq) * frequencyScaleFactor;
+			}
+			else
+			{
+				//LINEAR (SCALED) FREQUENCY SAMPLING 
+				//trueSampleIndex = i * linearSampleStretch; //don't like this anymore
 
-					//'logarithmic frequencies' just means we want to bias to the lower frequencies.
-					//by doing log2(max(i)) - log2(max(i) - i), we get a flipped log graph
-					//(make a graph of log2(64)-log2(64-x) to see what I mean)
-					//this isn't finished though, because that graph doesn't actually map the bar index (x) to the spectrum index (y).
-					//then we divide by highestLogFreq to make the graph to map 0-barAmount on the x axis to 0-1 in the y axis.
-					//we then use this to Lerp between frequency limits, and then an index is calculated.
-					//also 1 gets added to barAmount pretty much everywhere, because without it, the log hits (barAmount-1,max(freq))
+				trueSampleIndex = Mathf.Lerp(frequencyLimitLow, freqLim, ((float)i) / bandCount) * frequencyScaleFactor;
+				//sooooo this one's gotten fancier...
+				//firstly a lerp is used between frequency limits to get the 'desired frequency', then it's divided by the outputSampleRate (/2, who knows why) to get its location in the array, then multiplied by numSamples to get an index instead of a fraction.
 
-				}
-				else
-				{
-					//LINEAR (SCALED) FREQUENCY SAMPLING 
-					//trueSampleIndex = i * linearSampleStretch; //don't like this anymore
+			}
 
-					trueSampleIndex = Mathf.Lerp(frequencyLimitLow, freqLim, ((float)i) / barAmount) * frequencyScaleFactor;
-					//sooooo this one's gotten fancier...
-					//firstly a lerp is used between frequency limits to get the 'desired frequency', then it's divided by the outputSampleRate (/2, who knows why) to get its location in the array, then multiplied by numSamples to get an index instead of a fraction.
+			//the true sample is usually a decimal, so we need to lerp between the floor and ceiling of it.
 
-				}
+			int sampleIndexFloor = Mathf.FloorToInt(trueSampleIndex);
+			sampleIndexFloor = Mathf.Clamp(sampleIndexFloor, 0, spectrum.Length - 2); //just keeping it within the spectrum array's range
 
-				//the true sample is usually a decimal, so we need to lerp between the floor and ceiling of it.
+			sample = Mathf.SmoothStep(spectrum[sampleIndexFloor], spectrum[sampleIndexFloor + 1], trueSampleIndex - sampleIndexFloor); //smoothly interpolate between the two samples using the true index's decimal.
 
-				int sampleIndexFloor = Mathf.FloorToInt(trueSampleIndex);
-				sampleIndexFloor = Mathf.Clamp(sampleIndexFloor, 0, spectrum.Length - 2); //just keeping it within the spectrum array's range
-
-				value = Mathf.SmoothStep(spectrum[sampleIndexFloor], spectrum[sampleIndexFloor + 1], trueSampleIndex - sampleIndexFloor); //smoothly interpolate between the two samples using the true index's decimal.
-
-				//MANIPULATE & APPLY SAMPLES
-				if (multiplyByFrequency) //multiplies the amplitude by the true sample index
-				{
+			//MANIPULATE & APPLY SAMPLES
+			if (multiplyByFrequency) //multiplies the amplitude by the true sample index
+			{
 #if WEB_MODE
-            value = value * (Mathf.Log(trueSampleIndex + 1) + 1);  //different due to how the WebAudioAPI outputs spectrum data.
+            sample = sample * (Mathf.Log(trueSampleIndex + 1) + 1);  //different due to how the WebAudioAPI outputs spectrum data.
 
 #else
-					value = value * (trueSampleIndex + 1);
+				sample = sample * (trueSampleIndex + 1);
 #endif
-				}
+			}
 #if !WEB_MODE
-				value = Mathf.Sqrt(value); //compress the amplitude values by sqrt(x)
+			sample = Mathf.Sqrt(sample); //compress the amplitude values by sqrt(x)
 #endif
 
-				//DAMPENING
-				//Vector3 oldScale = bar.localScale;
+			//DAMPENING
+
+			bands[i] = Mathf.Max(sample, bands[i]);
+		}
+	}
+
+	public void OnUpdate()
+	{
+		if (Program.Instance)
+		{
+			for (int i = 0; i < bands.Length; i++)
+			{
+				var bar = bars[i];
+				var value = bands[i];
+
+				// Decay
+				bands[i] = Mathf.Max(bands[i] - Time.deltaTime * decaySpeed, 0f);
+
 				float oldYScale = oldYScales[i], newYScale;
 				if (value * barYScale > oldYScale)
 				{
@@ -276,7 +297,8 @@ public class BarManager : MonoBehaviour
 					newYScale = Mathf.Lerp(oldYScale, Mathf.Max(value * barYScale, barMinYScale), decayDamp);
 				}
 
-				bar.transform.localScale = new Vector3(barXScale, newYScale + 200, 1);
+				bar.transform.localScale = new Vector3(barXScale, Mathf.Lerp(barMinYScale, barYScale, value), 1);
+				//bar.transform.localScale = new Vector3(barXScale, newYScale, 1);
 				bar.TargetGraphic.color = Color.Lerp(colorMin, colorMax, value);
 
 				oldYScales[i] = newYScale;

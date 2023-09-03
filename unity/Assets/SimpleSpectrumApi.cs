@@ -30,7 +30,7 @@ namespace App
 #endif
 		}
 
-			public static void GetSpectrumData(float[] samples, int channel, FFTWindow window)
+		public static void GetSpectrumData(float[] samples, int channel, FFTWindow window)
 		{
 
 #if WEB_MODE

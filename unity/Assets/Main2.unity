@@ -959,11 +959,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a89cc0571b78ef4588b77cdfc1fa542, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  clipOverride: {fileID: 8300000, guid: 4dcb67e6369aa2342b18f52468d14030, type: 3}
+  clipOverride: {fileID: 8300000, guid: 166e4bfc9381050419acd6a840ce06e4, type: 3}
   audioSource: {fileID: 1073279696}
   audioListener: {fileID: 1561388116}
   samplesLengthSize: 12
-  bandCount: 100
+  bandCount: 40
   window: 1
   songInfoText: {fileID: 123838653}
   logoTransform: {fileID: 1875067156}
@@ -1116,23 +1116,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sampleChannel: 0
-  numSamples: 256
-  windowUsed: 5
+  numSamples: 512
+  windowUsed: 2
   useLogarithmicFrequency: 1
   multiplyByFrequency: 1
-  frequencyLimitLow: 0
-  frequencyLimitHigh: 22050
-  barAmount: 64
-  barYScale: 1000
-  barMinYScale: 240
+  frequencyLimitLow: 10
+  frequencyLimitHigh: 11025
+  bandCount: 75
+  barYScale: 850
+  barMinYScale: 600
   barPrefab: {fileID: 2266003268822355920, guid: fa8cf68da22ba364f8b0d5f2abec99e8,
     type: 3}
   barsFolder: {fileID: 1745896893}
-  barXScale: 120
+  barXScale: 150
   attackDamp: 0.3
   decayDamp: 0.15
+  decaySpeed: 4
   colorMin: {r: 0.22655392, g: 0, b: 1, a: 1}
-  colorMax: {r: 0.11764705, g: 1, b: 0.28367347, a: 1}
+  colorMax: {r: 0.21272053, g: 1, b: 0.17647058, a: 1}
 --- !u!4 &1777242734
 Transform:
   m_ObjectHideFlags: 0
@@ -1184,7 +1185,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 640, y: 640}
+  m_SizeDelta: {x: 512, y: 512}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1875067157
 MonoBehaviour:
