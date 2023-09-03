@@ -10,6 +10,7 @@ SimpleSpectrum.cs - Part of Simple Spectrum V2.1 by Sam Boyer.
 #define WEB_MODE //different to UNITY_WEBGL, as we still want functionality in the Editor!
 #endif
 
+using NUnit.Framework.Constraints;
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.UI;
@@ -321,36 +322,20 @@ public class BarManager : MonoBehaviour
 		frequencyScaleFactor = 1.0f / (AudioSettings.outputSampleRate / 2) * numSamples;
 	}
 
-
-	void Update()
+	void GetSpectrumData(float[] samples, int channel, FFTWindow window)
 	{
 
 #if WEB_MODE
-          SSWebInteract.GetSpectrumData(spectrum); //get the spectrum data from the JS lib
+          SSWebInteract.GetSpectrumData(samples); //get the spectrum data from the JS lib
 #else
-		AudioListener.GetSpectrumData(spectrum, sampleChannel, windowUsed); //get the spectrum data
-																								  //Debug.Log(spectrum[0]);
+		AudioListener.GetSpectrumData(samples, channel, window);
 #endif
+	}
 
-#if UNITY_EDITOR    //allows for editing curve while in play mode, disabled in build for optimisation
+	void Update()
+	{
+		GetSpectrumData(spectrum, sampleChannel, windowUsed);
 
-		float spectrumLength = bars.Length * (1 + barXSpacing);
-		float midPoint = spectrumLength / 2;
-
-		float curveAngleRads = 0, curveRadius = 0, halfwayAngleR = 0, halfwayAngleD = 0;
-		Vector3 curveCentreVector = Vector3.zero;
-		if (barCurveAngle > 0)
-		{
-			curveAngleRads = (barCurveAngle / 360) * (2 * Mathf.PI);
-			curveRadius = spectrumLength / curveAngleRads;
-
-			halfwayAngleR = curveAngleRads / 2;
-			halfwayAngleD = barCurveAngle / 2;
-			curveCentreVector = new Vector3(0, 0, -curveRadius);
-			if (barCurveAngle == 360)
-				curveCentreVector = new Vector3(0, 0, 0);
-		}
-#endif
 #if WEB_MODE
             float freqLim = frequencyLimitHigh * 0.76f; //AnalyserNode.getFloatFrequencyData doesn't fill the array, for some reason
 #else
@@ -456,22 +441,6 @@ public class BarManager : MonoBehaviour
 
 				oldColorValues[i] = newColorVal;
 			}
-
-#if UNITY_EDITOR
-			//realtime modifications for Editor only
-			if (barCurveAngle > 0)
-			{
-				float position = ((float)i / bars.Length);
-				float thisBarAngleR = (position * curveAngleRads) - halfwayAngleR;
-				float thisBarAngleD = (position * barCurveAngle) - halfwayAngleD;
-				bar.localRotation = Quaternion.Euler(barXRotation, thisBarAngleD, 0);
-				bar.localPosition = new Vector3(Mathf.Sin(thisBarAngleR) * curveRadius, 0, Mathf.Cos(thisBarAngleR) * curveRadius) + curveCentreVector;
-			}
-			else
-			{
-				bar.localPosition = new Vector3(i * (1 + barXSpacing) - midPoint, 0, 0);
-			}
-#endif
 		}
 	}
 
