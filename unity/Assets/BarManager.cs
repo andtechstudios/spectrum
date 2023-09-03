@@ -14,13 +14,8 @@ using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.UI;
 
-public class SimpleSpectrum : MonoBehaviour
+public class BarManager : MonoBehaviour
 {
-
-	public enum SourceType
-	{
-		AudioSource, AudioListener, MicrophoneInput, StereoMix, Custom
-	}
 
 	[SerializeField]
 	public AudioMixerGroup muteGroup; //the AudioMixerGroup used for silent tracks (microphones). Don't change.
@@ -32,12 +27,6 @@ public class SimpleSpectrum : MonoBehaviour
 	public bool isEnabled = true;
 
 	#region SAMPLING PROPERTIES
-
-	/// <summary>
-	/// The type of source for spectrum data.
-	/// </summary>
-	[Tooltip("The type of source for spectrum data.")]
-	public SourceType sourceType = SourceType.AudioSource;
 
 	/// <summary>
 	/// The AudioSource to take data from. Can be empty if sourceType is not AudioSource.
@@ -204,10 +193,7 @@ public class SimpleSpectrum : MonoBehaviour
 		}
 		set
 		{
-			if (sourceType == SourceType.Custom)
-				spectrum = value;
-			else
-				Debug.LogError("Error from SimpleSpectrum: spectrumInputData cannot be set while sourceType is not Custom.");
+			Debug.LogError("Error from SimpleSpectrum: spectrumInputData cannot be set while sourceType is not Custom.");
 		}
 	}
 
@@ -242,9 +228,6 @@ public class SimpleSpectrum : MonoBehaviour
 
 	void Start()
 	{
-		if (audioSource == null && sourceType == SourceType.AudioSource)
-			Debug.LogError("An audio source has not been assigned. Please assign a reference to a source, or set useAudioListener instead.");
-
 		RebuildSpectrum();
 	}
 
@@ -401,10 +384,6 @@ public class SimpleSpectrum : MonoBehaviour
             Destroy(GetComponent<AudioSource>());
         }
 #else
-		if (sourceType == SourceType.MicrophoneInput || sourceType == SourceType.StereoMix || sourceType == SourceType.AudioSource)
-		{
-			Debug.LogError("Error from SimpleSpectrum: Microphone, Stereo Mix or AudioSource cannot be used in WebGL!");
-		}
 #endif
 	}
 
@@ -413,25 +392,12 @@ public class SimpleSpectrum : MonoBehaviour
 	{
 		if (isEnabled)
 		{
-
-			//sampleChannel = Mathf.Clamp(sampleChannel, 0, 1); //force the channel to be valid
-
-			if (sourceType != SourceType.Custom)
-			{
-				if (sourceType == SourceType.AudioListener)
-				{
 #if WEB_MODE
-                    SSWebInteract.GetSpectrumData(spectrum); //get the spectrum data from the JS lib
+          SSWebInteract.GetSpectrumData(spectrum); //get the spectrum data from the JS lib
 #else
-					AudioListener.GetSpectrumData(spectrum, sampleChannel, windowUsed); //get the spectrum data
-																											  //Debug.Log(spectrum[0]);
+			AudioListener.GetSpectrumData(spectrum, sampleChannel, windowUsed); //get the spectrum data
+																									  //Debug.Log(spectrum[0]);
 #endif
-				}
-				else
-				{
-					audioSource.GetSpectrumData(spectrum, sampleChannel, windowUsed); //get the spectrum data
-				}
-			}
 
 #if UNITY_EDITOR    //allows for editing curve while in play mode, disabled in build for optimisation
 
