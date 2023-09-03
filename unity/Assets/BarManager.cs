@@ -19,17 +19,7 @@ using UnityEngine.UI;
 public class BarManager : MonoBehaviour
 {
 
-	[SerializeField]
-	public AudioMixerGroup muteGroup; //the AudioMixerGroup used for silent tracks (microphones). Don't change.
-
 	#region SAMPLING PROPERTIES
-
-	/// <summary>
-	/// The AudioSource to take data from. Can be empty if sourceType is not AudioSource.
-	/// </summary>
-	[Tooltip("The AudioSource to take data from.")]
-	public AudioSource audioSource;
-
 	/// <summary>
 	/// The audio channel to use when sampling.
 	/// </summary>
