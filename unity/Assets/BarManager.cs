@@ -302,9 +302,6 @@ public class BarManager : MonoBehaviour
 			bar.TargetGraphic.color = Color.Lerp(colorMin, colorMax, value);
 
 			oldYScales[i] = newYScale;
-
-			//set colour
-			Debug.Log("no coloring");
 		}
 	}
 
