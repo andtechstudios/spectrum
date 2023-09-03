@@ -51,13 +51,33 @@ namespace App
 			Instance = Instance == this ? null : Instance;
 		}
 
+		IEnumerator FadeIn()
+		{
+			var delay = 2f;
+			var fadeDuration = 3f;
+
+			yield return new WaitForSeconds(delay);
+			for (float t = 0; t < fadeDuration; t += Time.deltaTime)
+			{
+				yield return null;
+
+				songInfoText.color = new Color(1f, 1f, 1f, t / fadeDuration);
+			}
+			songInfoText.color = Color.white;
+		}
+
 		private IEnumerator Start()
 		{
+			songInfoText.color = Color.clear;
+
 			yield return DoConfig();
 
 			songInfoText.text = $"{config.artist}\n\"{config.title}\"\nSpooky Tune Jam 2023";
 
 			yield return DoAudio();
+
+			StartCoroutine(FadeIn());
+
 			//yield return DoUI();
 		}
 

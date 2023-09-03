@@ -184,8 +184,9 @@ MonoBehaviour:
 
     Spooky Tune Jam 2023'
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 0caabae80c4dac04992ded6df09895b5, type: 2}
+  m_sharedMaterial: {fileID: -3817065638094833262, guid: 0caabae80c4dac04992ded6df09895b5,
+    type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -221,7 +222,7 @@ MonoBehaviour:
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0
-  m_lineSpacing: 0
+  m_lineSpacing: 20
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
@@ -626,6 +627,7 @@ MonoBehaviour:
   target: {fileID: 0}
   minScale: 0
   maxScale: 0
+  decaySpeed: 0
 --- !u!1 &1325687148
 GameObject:
   m_ObjectHideFlags: 0
@@ -1235,6 +1237,7 @@ MonoBehaviour:
   target: {fileID: 1875067156}
   minScale: 1
   maxScale: 1.2
+  decaySpeed: 2
 --- !u!1 &2034563108
 GameObject:
   m_ObjectHideFlags: 0
