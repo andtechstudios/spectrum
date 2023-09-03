@@ -11,18 +11,18 @@ namespace App
 		public IEnumerator Read(string uri, AudioType audioType = AudioType.MPEG)
 		{
 			Clip = null;
-			using (var uwr = UnityWebRequestMultimedia.GetAudioClip(uri, audioType))
+			using (var request = UnityWebRequestMultimedia.GetAudioClip(uri, audioType))
 			{
-				((DownloadHandlerAudioClip)uwr.downloadHandler).streamAudio = true;
+				((DownloadHandlerAudioClip)request.downloadHandler).streamAudio = true;
 
-				yield return uwr.SendWebRequest();
+				yield return request.SendWebRequest();
 
-				if (uwr.result != UnityWebRequest.Result.Success)
+				if (request.result != UnityWebRequest.Result.Success)
 				{
 					yield break;
 				}
 
-				var dlHandler = (DownloadHandlerAudioClip)uwr.downloadHandler;
+				var dlHandler = (DownloadHandlerAudioClip)request.downloadHandler;
 				if (dlHandler.isDone)
 				{
 					Clip = dlHandler.audioClip;

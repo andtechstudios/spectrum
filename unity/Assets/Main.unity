@@ -132,7 +132,7 @@ GameObject:
   - component: {fileID: 123838654}
   - component: {fileID: 123838653}
   m_Layer: 5
-  m_Name: InfoText
+  m_Name: Info
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -154,7 +154,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -24, y: 24}
+  m_AnchoredPosition: {x: -48, y: 48}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 1, y: 0}
 --- !u!114 &123838653
@@ -630,16 +630,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a89cc0571b78ef4588b77cdfc1fa542, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  clipOverride: {fileID: 8300000, guid: 4dcb67e6369aa2342b18f52468d14030, type: 3}
+  clipOverride: {fileID: 8300000, guid: ed8861bf68294a643b78b817eaeba453, type: 3}
   audioSource: {fileID: 1624406247}
-  samplesLengthSize: 10
+  samplesLengthSize: 9
   window: 1
   scale: {x: 0.2, y: 150}
   bandCount: 64
-  bands: []
   bars: []
-  decay: 1.5
+  energyDecay: 3
+  barDecay: 1.4
   logScale: 50
+  songInfoText: {fileID: 123838653}
+  logoTransform: {fileID: 1875067156}
   barsTransform: {fileID: 1745896893}
   barPrefab: {fileID: 2266003268822355920, guid: fa8cf68da22ba364f8b0d5f2abec99e8,
     type: 3}
@@ -672,7 +674,7 @@ MonoBehaviour:
   barColors:
     serializedVersion: 2
     key0: {r: 0.14679962, g: 0, b: 0.34901962, a: 1}
-    key1: {r: 0.36320752, g: 1, b: 0.46477538, a: 1}
+    key1: {r: 0.36470592, g: 1, b: 0.3832052, a: 1}
     key2: {r: 0, g: 0, b: 0, a: 0}
     key3: {r: 0, g: 0, b: 0, a: 0}
     key4: {r: 0, g: 0, b: 0, a: 0}
@@ -897,7 +899,7 @@ GameObject:
   - component: {fileID: 1875067158}
   - component: {fileID: 1875067157}
   m_Layer: 5
-  m_Name: LogoText
+  m_Name: Logo
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

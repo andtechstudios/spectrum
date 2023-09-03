@@ -1,14 +1,19 @@
-using System.CodeDom;
+using System;
 using System.Collections;
-using System.Drawing.Text;
-using System.Net.NetworkInformation;
-using System.Text.RegularExpressions;
-using JetBrains.Annotations;
-using TreeEditor;
+using System.Security.Policy;
+using TMPro;
 using UnityEngine;
+using UnityEngine.Networking;
 
 namespace App
 {
+
+	[Serializable]
+	public class Config
+	{
+		public string title;
+		public string artist;
+	}
 
 	public class Program : MonoBehaviour
 	{
@@ -24,16 +29,19 @@ namespace App
 
 		public Vector2 scale;
 
-		private float[] spectrum;
 		public int bandCount;
 
-		public float[] bands;
 		public Bar[] bars;
 
-		public float decay;
+		public float energyDecay;
+		public float barDecay;
 		public float logScale;
 
 		[Header("UI")]
+		[SerializeField]
+		private TMP_Text songInfoText;
+		[SerializeField]
+		private RectTransform logoTransform;
 		[SerializeField]
 		private RectTransform barsTransform;
 		[SerializeField]
@@ -50,10 +58,17 @@ namespace App
 		[SerializeField]
 		private Gradient barColors;
 
+		// Storage
+		private float[] spectrum;
+		private float frameEnergy;
+		private Config config;
+		private float[] bands;
+		private float energy;
+
 		private void Awake()
 		{
 			int n = 1 << samplesLengthSize;
-			
+
 			spectrum = new float[n];
 			bands = new float[bandCount];
 			bars = new Bar[bandCount];
@@ -61,8 +76,36 @@ namespace App
 
 		private IEnumerator Start()
 		{
+			yield return DoConfig();
+
+			songInfoText.text = $"{config.artist}\n\"{config.title}\"\nSpooky Tune Jam 2023";
+
 			yield return DoAudio();
 			yield return DoUI();
+		}
+
+		IEnumerator DoConfig()
+		{
+#if UNITY_EDITOR
+			var uriPrefix = "file://" + Application.dataPath + "/static/";
+#else
+			var uriPrefix = Application.absoluteURL;
+			uriPrefix = Regex.Replace(uriPrefix, @"/index.html?$", "/");
+#endif
+			var uri = uriPrefix + "config.json";
+			using (var request = UnityWebRequest.Get(uri))
+			{
+				yield return request.SendWebRequest();
+
+				if (request.result != UnityWebRequest.Result.Success)
+				{
+					Debug.Log(request.error);
+				}
+				else
+				{
+					config = JsonUtility.FromJson<Config>(request.downloadHandler.text);
+				}
+			}
 		}
 
 		IEnumerator DoAudio()
@@ -70,7 +113,7 @@ namespace App
 			var reader = new AudioReader();
 
 #if UNITY_EDITOR
-			var uriPrefix = "file://" + Application.dataPath + "/Audio/";
+			var uriPrefix = "file://" + Application.dataPath + "/static/";
 #else
 			var uriPrefix = Application.absoluteURL;
 			uriPrefix = Regex.Replace(uriPrefix, @"/index.html?$", "/");
@@ -116,38 +159,23 @@ namespace App
 			yield break;
 		}
 
-		private void Update()
+		private void FixedUpdate()
 		{
 			if (audioSource.clip)
 			{
 				audioSource.GetSpectrumData(spectrum, 0, window);
-				
-				var max = -1f;
-				for (int i = 1; i < spectrum.Length - 1; i++)
-				{
-					
-					Debug.DrawLine(new Vector3(scale.x * (i - 1), spectrum[i] + 10, 0), new Vector3(scale.x * i, spectrum[i + 1] + 10, 0), Color.red);
-					Debug.DrawLine(new Vector3(scale.x * (i - 1), Mathf.Log(spectrum[i - 1]) + 10, 2), new Vector3(scale.x * i, Mathf.Log(spectrum[i]) + 10, 2), Color.cyan);
-					Debug.DrawLine(new Vector3(scale.x * Mathf.Log(i - 1), spectrum[i - 1] - 10, 1), new Vector3(scale.x * Mathf.Log(i), spectrum[i] - 10, 1), Color.green);
-					Debug.DrawLine(new Vector3(scale.x * Mathf.Log(i - 1), Mathf.Log(spectrum[i - 1]), 3), new Vector3(scale.x * Mathf.Log(i), Mathf.Log(spectrum[i]), 3), Color.blue);
-					max = Mathf.Max(max, spectrum[i]);
-				}
 
-				//var sampleRange = spectrum.Length / 4;
-				//var width = sampleRange / bandCount;
-				//for (int i = 0; i < sampleRange; i++)
-				//{
-				//	var bandIndex = Mathf.Clamp(Mathf.RoundToInt(i / width), 0, bandCount - 1);
-				//	candidateBands[bandIndex] += spectrum[i] / max;
-				//}
-
-				//Debug.Log(max);
 				var candidateBands = new float[spectrum.Length];
+				frameEnergy = 0f;
 				for (int i = 0; i < bands.Length; i++)
 				{
 					var bucket = Mathf.Clamp(i, 0, bandCount - 1);
 					candidateBands[bucket] = spectrum[i];
+					frameEnergy = spectrum[i] * spectrum[i];
 				}
+				frameEnergy = Mathf.Sqrt(frameEnergy) / 0.015f;
+				energy = Mathf.Max(frameEnergy, energy);
+				energy = Mathf.Clamp01(energy);
 				for (int i = 0; i < bands.Length; i++)
 				{
 					float logAmplitude = Mathf.Log10(1 + candidateBands[i]) * logScale;
@@ -159,20 +187,31 @@ namespace App
 					bands[i] = Mathf.Max(logAmplitude, bands[i]);
 					bands[i] = Mathf.Clamp01(bands[i]);
 				}
+			}
+		}
+
+		private void Update()
+		{
+			if (audioSource.clip)
+			{
+				energy = Mathf.Max(energy - Time.deltaTime * energyDecay, 0f);
+				// Decay since last frame
+				for (int i = 0; i < bands.Length; i++)
+				{
+					bands[i] = Mathf.Max(bands[i] - Time.deltaTime * barDecay, 0f);
+				}
 
 				// Update
 				for (int i = 0; i < bands.Length; i++)
 				{
 					var a = bands[i];
-					var t = (float)i / bands.Length;
 
 					bars[i].transform.localScale = new Vector3(1f, Mathf.Lerp(minimumBarLength, maximumBarLength, a), 1f);
 					bars[i].TargetGraphic.color = barColors.Evaluate(a);
 				}
-				for (int i = 0; i < bands.Length; i++)
-				{
-					bands[i] = Mathf.Max(bands[i] - Time.deltaTime * decay, 0f);
-				}
+
+				var scale = Mathf.Lerp(0.95f, 1f, energy * energy);
+				logoTransform.localScale = new Vector3(scale, scale, scale);
 			}
 		}
 	}
