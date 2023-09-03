@@ -153,11 +153,11 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1325687152}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 1, y: 0}
-  m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -48, y: 48}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 48, y: 48}
   m_SizeDelta: {x: 0, y: 0}
-  m_Pivot: {x: 1, y: 0}
+  m_Pivot: {x: 0, y: 0}
 --- !u!114 &123838653
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -217,7 +217,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 1
-  m_HorizontalAlignment: 4
+  m_HorizontalAlignment: 1
   m_VerticalAlignment: 1024
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -1125,15 +1125,15 @@ MonoBehaviour:
   frequencyLimitLow: 10
   frequencyLimitHigh: 11025
   bandCount: 75
-  barXScale: 110
-  barMinYScale: 500
+  barXScale: 90
+  barMinYScale: 350
   barYMaxScale: 800
   barPrefab: {fileID: 2266003268822355920, guid: fa8cf68da22ba364f8b0d5f2abec99e8,
     type: 3}
   barsFolder: {fileID: 1745896893}
   decaySpeed: 4
-  colorMin: {r: 0.22655392, g: 0, b: 1, a: 1}
-  colorMax: {r: 0.21272053, g: 1, b: 0.17647058, a: 1}
+  colorMin: {r: 0.20624208, g: 0, b: 1, a: 1}
+  colorMax: {r: 1, g: 0.5185516, b: 0, a: 1}
 --- !u!4 &1777242734
 Transform:
   m_ObjectHideFlags: 0
@@ -1311,11 +1311,11 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 1561388115}
+  - {fileID: 1777242734}
   - {fileID: 1073279695}
   - {fileID: 2034563111}
-  - {fileID: 1301962667}
-  - {fileID: 1777242734}
   - {fileID: 1325687152}
   - {fileID: 1340784869}
   - {fileID: 1455250755}
   - {fileID: 1153101712}
+  - {fileID: 1301962667}

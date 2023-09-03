@@ -56,6 +56,13 @@ namespace App
 			var delay = 2f;
 			var fadeDuration = 3f;
 
+			// Wait for browser to allow audio
+			if (AudioListener.pause)
+			{
+				yield return new WaitForSeconds(1f);
+			}
+
+			// Delay, then fade in
 			yield return new WaitForSeconds(delay);
 			for (float t = 0; t < fadeDuration; t += Time.deltaTime)
 			{
