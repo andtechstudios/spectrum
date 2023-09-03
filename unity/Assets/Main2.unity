@@ -959,7 +959,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a89cc0571b78ef4588b77cdfc1fa542, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  clipOverride: {fileID: 8300000, guid: 166e4bfc9381050419acd6a840ce06e4, type: 3}
+  clipOverride: {fileID: 8300000, guid: 083309fef1f0e9a47a01b7dab3f6f44f, type: 3}
   audioSource: {fileID: 1073279696}
   audioListener: {fileID: 1561388116}
   samplesLengthSize: 12
@@ -1123,14 +1123,12 @@ MonoBehaviour:
   frequencyLimitLow: 10
   frequencyLimitHigh: 11025
   bandCount: 75
-  barYScale: 850
-  barMinYScale: 600
+  barXScale: 110
+  barMinYScale: 500
+  barYMaxScale: 800
   barPrefab: {fileID: 2266003268822355920, guid: fa8cf68da22ba364f8b0d5f2abec99e8,
     type: 3}
   barsFolder: {fileID: 1745896893}
-  barXScale: 150
-  attackDamp: 0.3
-  decayDamp: 0.15
   decaySpeed: 4
   colorMin: {r: 0.22655392, g: 0, b: 1, a: 1}
   colorMax: {r: 0.21272053, g: 1, b: 0.17647058, a: 1}

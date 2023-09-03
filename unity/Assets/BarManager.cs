@@ -78,10 +78,10 @@ public class BarManager : MonoBehaviour
 	[Tooltip("The amount of bars to use. Does not have to be equal to Num Samples, but probably should be lower.")]
 	public int bandCount = 32;
 	/// <summary>
-	/// Stretches the values of the bars.
+	/// Stretches the bars sideways. 
 	/// </summary>
-	[Tooltip("Stretches the values of the bars.")]
-	public float barYScale = 50;
+	[Tooltip("Stretches the bars sideways.")]
+	public float barXScale = 1;
 	/// <summary>
 	/// Sets a minimum scale for the bars; they will never go below this scale.
 	/// This value is also used when isEnabled is false.
@@ -89,29 +89,17 @@ public class BarManager : MonoBehaviour
 	[Tooltip("Sets a minimum scale for the bars.")]
 	public float barMinYScale = 0.1f;
 	/// <summary>
+	/// Stretches the values of the bars.
+	/// </summary>
+	[Tooltip("Stretches the values of the bars.")]
+	public float barYMaxScale = 50;
+	/// <summary>
 	/// The prefab of bar to use when building.
 	/// Refer to the documentation to use a custom prefab.
 	/// </summary>
 	[Tooltip("The prefab of bar to use when building. Choose one from SimpleSpectrum/Bar Prefabs, or refer to the documentation to use a custom prefab.")]
 	public Bar barPrefab;
 	public Transform barsFolder;
-	/// <summary>
-	/// Stretches the bars sideways. 
-	/// </summary>
-	[Tooltip("Stretches the bars sideways.")]
-	public float barXScale = 1;
-	/// <summary>
-	/// The amount of dampening used when the new scale is higher than the bar's existing scale. Must be between 0 (slowest) and 1 (fastest).
-	/// </summary>
-	[Range(0, 1)]
-	[Tooltip("The amount of dampening used when the new scale is higher than the bar's existing scale.")]
-	public float attackDamp = 0.3f;
-	/// <summary>
-	/// The amount of dampening used when the new scale is lower than the bar's existing scale. Must be between 0 (slowest) and 1 (fastest).
-	/// </summary>
-	[Range(0, 1)]
-	[Tooltip("The amount of dampening used when the new scale is lower than the bar's existing scale.")]
-	public float decayDamp = 0.15f;
 	public float decaySpeed;
 	#endregion
 
@@ -144,20 +132,7 @@ public class BarManager : MonoBehaviour
 		}
 	}
 
-	/// <summary>
-	/// Returns the output float array used for bar scaling (i.e. after logarithmic scaling and attack/decay). The size of the array depends on barAmount.
-	/// </summary>
-	public float[] spectrumOutputData
-	{
-		get
-		{
-			return oldYScales;
-		}
-	}
-
-
 	float[] spectrum;
-	float[] oldYScales; //also optimisation
 	float[] bands;
 	float highestLogFreq, frequencyScaleFactor; //multiplier to ensure that the frequencies stretch to the highest record in the array.
 	Bar[] bars;
@@ -179,7 +154,6 @@ public class BarManager : MonoBehaviour
 
 		//initialise arrays
 		spectrum = new float[numSamples];
-		oldYScales = new float[bandCount];
 		bands = new float[bandCount];
 		highestLogFreq = Mathf.Log(bandCount + 1, 2); //gets the highest possible logged frequency, used to calculate which sample of the spectrum to use for a bar
 		frequencyScaleFactor = 1.0f / (AudioSettings.outputSampleRate / 2) * numSamples;
@@ -287,21 +261,8 @@ public class BarManager : MonoBehaviour
 				// Decay
 				bands[i] = Mathf.Max(bands[i] - Time.deltaTime * decaySpeed, 0f);
 
-				float oldYScale = oldYScales[i], newYScale;
-				if (value * barYScale > oldYScale)
-				{
-					newYScale = Mathf.Lerp(oldYScale, Mathf.Max(value * barYScale, barMinYScale), attackDamp);
-				}
-				else
-				{
-					newYScale = Mathf.Lerp(oldYScale, Mathf.Max(value * barYScale, barMinYScale), decayDamp);
-				}
-
-				bar.transform.localScale = new Vector3(barXScale, Mathf.Lerp(barMinYScale, barYScale, value), 1);
-				//bar.transform.localScale = new Vector3(barXScale, newYScale, 1);
+				bar.transform.localScale = new Vector3(barXScale, Mathf.Lerp(barMinYScale, barYMaxScale, value), 1);
 				bar.TargetGraphic.color = Color.Lerp(colorMin, colorMax, value);
-
-				oldYScales[i] = newYScale;
 			}
 		}
 	}
