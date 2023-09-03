@@ -59,17 +59,10 @@ namespace Spectrum
 		private TMP_Text songInfoText;
 		[SerializeField]
 		private RectTransform logoTransform;
-		public SpectrumWidget spectrumWidget;
 
 		// Storage
 		private Config config;
 		private Sampler sampler;
-		private float[] loudnessBuffer;
-
-		private void Awake()
-		{
-			loudnessBuffer = new float[4];
-		}
 
 		private void OnEnable()
 		{
@@ -98,8 +91,8 @@ namespace Spectrum
 				UseLogarithmicFrequency = useLogarithmicFrequency,
 			};
 			barManager.Init(sampler);
-			StartCoroutine(FadeInChryon());
 			yield break;
+			StartCoroutine(FadeInChryon());
 
 		}
 
