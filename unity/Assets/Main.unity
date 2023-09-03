@@ -632,14 +632,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a89cc0571b78ef4588b77cdfc1fa542, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  clipOverride: {fileID: 8300000, guid: 083309fef1f0e9a47a01b7dab3f6f44f, type: 3}
+  clipOverride: {fileID: 8300000, guid: cfad1f56e842c594cb547908c9c13505, type: 3}
   audioSource: {fileID: 1624406247}
-  samplesLengthSize: 9
+  samplesLengthSize: 12
+  bandCount: 100
   window: 1
-  scale: {x: 0.2, y: 150}
-  bandCount: 64
-  bars: []
-  energyDecay: 3
+  energyDecay: 2
   barDecay: 1.4
   logScale: 50
   songInfoText: {fileID: 123838653}

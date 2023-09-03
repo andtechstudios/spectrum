@@ -8,36 +8,30 @@ using UnityEngine.Networking;
 namespace App
 {
 
-	[Serializable]
-	public class Config
-	{
-		public string title;
-		public string artist;
-	}
-
 	public class Program : MonoBehaviour
 	{
+		[Header("Program Settings")]
 		[SerializeField]
 		public AudioClip clipOverride;
 		[SerializeField]
 		private AudioSource audioSource;
+
+		[Header("Spectrum Settings")]
 		[SerializeField]
 		[Range(6f, 13f)]
 		private int samplesLengthSize = 6;
+		[Range(32, 100)]
+		public int bandCount;
 		[SerializeField]
 		private FFTWindow window;
+		[SerializeField]
+		private float energyDecay;
+		[SerializeField]
+		private float barDecay;
+		[SerializeField]
+		private float logScale;
 
-		public Vector2 scale;
-
-		public int bandCount;
-
-		public Bar[] bars;
-
-		public float energyDecay;
-		public float barDecay;
-		public float logScale;
-
-		[Header("UI")]
+		[Header("UI Settings")]
 		[SerializeField]
 		private TMP_Text songInfoText;
 		[SerializeField]
@@ -47,10 +41,10 @@ namespace App
 		[SerializeField]
 		private Bar barPrefab;
 		[SerializeField]
-		[Range(200f, 800f)]
+		[Range(200f, 600f)]
 		private int minimumBarLength;
 		[SerializeField]
-		[Range(400f, 1000f)]
+		[Range(500f, 800f)]
 		private int maximumBarLength;
 
 		[SerializeField]
@@ -59,11 +53,11 @@ namespace App
 		private Gradient barColors;
 
 		// Storage
-		private float[] spectrum;
-		private float frameEnergy;
 		private Config config;
-		private float[] bands;
 		private float energy;
+		private float[] spectrum;
+		private float[] bands;
+		private Bar[] bars;
 
 		private void Awake()
 		{
@@ -78,7 +72,7 @@ namespace App
 		{
 			yield return DoConfig();
 
-			songInfoText.text = $"{config.artist}\n\"{config.title}\"\nSpooky Tune Jam 2023";
+			//songInfoText.text = $"{config.artist}\n\"{config.title}\"\nSpooky Tune Jam 2023";
 
 			yield return DoAudio();
 			yield return DoUI();
@@ -90,7 +84,7 @@ namespace App
 			var uriPrefix = "file://" + Application.dataPath + "/static/";
 #else
 			var uriPrefix = Application.absoluteURL;
-			uriPrefix = Regex.Replace(uriPrefix, @"/index.html?$", "/");
+			uriPrefix = System.Text.RegularExpressions.Regex.Replace(uriPrefix, @"/index.html?$", "/");
 #endif
 			var uri = uriPrefix + "config.json";
 			using (var request = UnityWebRequest.Get(uri))
@@ -116,7 +110,7 @@ namespace App
 			var uriPrefix = "file://" + Application.dataPath + "/static/";
 #else
 			var uriPrefix = Application.absoluteURL;
-			uriPrefix = Regex.Replace(uriPrefix, @"/index.html?$", "/");
+			uriPrefix = System.Text.RegularExpressions.Regex.Replace(uriPrefix, @"/index.html?$", "/");
 #endif
 
 			var clip = clipOverride;
@@ -166,16 +160,16 @@ namespace App
 				audioSource.GetSpectrumData(spectrum, 0, window);
 
 				var candidateBands = new float[spectrum.Length];
-				frameEnergy = 0f;
+				var energy = 0f;
 				for (int i = 0; i < bands.Length; i++)
 				{
 					var bucket = Mathf.Clamp(i, 0, bandCount - 1);
 					candidateBands[bucket] = spectrum[i];
-					frameEnergy = spectrum[i] * spectrum[i];
+					energy = spectrum[i] * spectrum[i];
 				}
-				frameEnergy = Mathf.Sqrt(frameEnergy) / 0.015f;
-				energy = Mathf.Max(frameEnergy, energy);
-				energy = Mathf.Clamp01(energy);
+				energy = Mathf.Sqrt(energy) / 0.015f;
+				this.energy = Mathf.Max(energy, this.energy);
+				this.energy = Mathf.Clamp01(this.energy);
 				for (int i = 0; i < bands.Length; i++)
 				{
 					float logAmplitude = Mathf.Log10(1 + candidateBands[i]) * logScale;
@@ -194,8 +188,8 @@ namespace App
 		{
 			if (audioSource.clip)
 			{
-				energy = Mathf.Max(energy - Time.deltaTime * energyDecay, 0f);
 				// Decay since last frame
+				energy = Mathf.Max(energy - Time.deltaTime * energyDecay, 0f);
 				for (int i = 0; i < bands.Length; i++)
 				{
 					bands[i] = Mathf.Max(bands[i] - Time.deltaTime * barDecay, 0f);
