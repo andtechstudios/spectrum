@@ -941,6 +941,7 @@ GameObject:
   - component: {fileID: 1561388115}
   - component: {fileID: 1561388114}
   - component: {fileID: 1561388116}
+  - component: {fileID: 1561388117}
   m_Layer: 0
   m_Name: Runtime
   m_TagString: Untagged
@@ -960,7 +961,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a89cc0571b78ef4588b77cdfc1fa542, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  clipOverride: {fileID: 8300000, guid: f70a65ce69659ab4aa312f0f5f5809d6, type: 3}
+  clipOverride: {fileID: 8300000, guid: 083309fef1f0e9a47a01b7dab3f6f44f, type: 3}
   audioSource: {fileID: 1073279696}
   audioListener: {fileID: 1561388116}
   samplesLengthSize: 12
@@ -1019,6 +1020,18 @@ AudioListener:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1561388113}
   m_Enabled: 1
+--- !u!114 &1561388117
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1561388113}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f1238756f35eac42902042e06463e42, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1745896892
 GameObject:
   m_ObjectHideFlags: 0
@@ -1131,8 +1144,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e299b0eb6398a01448d00ed3542ab86a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  muteGroup: {fileID: 24300001, guid: 1d9bfcb87d0ba844e9071a1e60825ede, type: 2}
-  audioSource: {fileID: 0}
   sampleChannel: 0
   numSamples: 256
   windowUsed: 5
@@ -1146,13 +1157,9 @@ MonoBehaviour:
   barPrefab: {fileID: 2266003268822355920, guid: fa8cf68da22ba364f8b0d5f2abec99e8,
     type: 3}
   barsFolder: {fileID: 1745896893}
-  barXScale: 32
-  barXSpacing: 1
-  barCurveAngle: 360
-  barXRotation: 90
+  barXScale: 40
   attackDamp: 0.3
   decayDamp: 0.15
-  useColorGradient: 0
   colorMin: {r: 0.22655392, g: 0, b: 1, a: 1}
   colorMax: {r: 0.11764705, g: 1, b: 0.28367347, a: 1}
 --- !u!4 &1777242734

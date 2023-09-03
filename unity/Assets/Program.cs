@@ -10,9 +10,12 @@ namespace App
 
 	public class Program : MonoBehaviour
 	{
+		public static Program Instance { get; private set; }
+
 		[Header("Program Settings")]
 		[SerializeField]
 		public AudioClip clipOverride;
+		public AudioSource AudioSource => audioSource;
 		[SerializeField]
 		private AudioSource audioSource;
 		[SerializeField]
@@ -48,6 +51,16 @@ namespace App
 		private float energy;
 		private float[] spectrum;
 		private float[] bands;
+
+		private void OnEnable()
+		{
+			Instance = Instance ? Instance : this;
+		}
+
+		private void OnDisable()
+		{
+			Instance = Instance == this ? null : Instance;
+		}
 
 		private IEnumerator Start()
 		{
