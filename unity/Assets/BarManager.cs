@@ -10,6 +10,7 @@ SimpleSpectrum.cs - Part of Simple Spectrum V2.1 by Sam Boyer.
 #define WEB_MODE //different to UNITY_WEBGL, as we still want functionality in the Editor!
 #endif
 
+using App;
 using NUnit.Framework.Constraints;
 using UnityEngine;
 using UnityEngine.Audio;
@@ -105,7 +106,8 @@ public class BarManager : MonoBehaviour
 	/// Refer to the documentation to use a custom prefab.
 	/// </summary>
 	[Tooltip("The prefab of bar to use when building. Choose one from SimpleSpectrum/Bar Prefabs, or refer to the documentation to use a custom prefab.")]
-	public GameObject barPrefab;
+	public Bar barPrefab;
+	public Transform barsFolder;
 	/// <summary>
 	/// Stretches the bars sideways. 
 	/// </summary>
@@ -190,7 +192,7 @@ public class BarManager : MonoBehaviour
 	float[] spectrum;
 
 	//float lograithmicAmplitudePower = 2, multiplyByFrequencyPower = 1.5f;
-	Transform[] bars;
+	Bar[] bars;
 	float[] oldYScales; //also optimisation
 	float[] oldColorValues; //...optimisation
 
@@ -221,7 +223,7 @@ public class BarManager : MonoBehaviour
 
 		//initialise arrays
 		spectrum = new float[numSamples];
-		bars = new Transform[barAmount];
+		bars = new Bar[barAmount];
 		oldYScales = new float[barAmount];
 		oldColorValues = new float[barAmount];
 
@@ -246,24 +248,10 @@ public class BarManager : MonoBehaviour
 		//bar instantiation loop
 		for (int i = 0; i < barAmount; i++)
 		{
-			GameObject barClone = Instantiate(barPrefab, transform, false) as GameObject; //create the bars and assign the parent
-																													//barClone.name = i.ToString();
-			barClone.transform.localScale = new Vector3(barXScale, barMinYScale, 1);
+			var bar = Instantiate(barPrefab, barsFolder); //create the bars and assign the parent
+			bar.transform.localEulerAngles = new Vector3(0f, 0f, (float)i / barAmount * 360f);
 
-			if (barCurveAngle > 0) //apply spectrum bending
-			{
-				float position = ((float)i / barAmount);
-				float thisBarAngleR = (position * curveAngleRads) - halfwayAngleR;
-				float thisBarAngleD = (position * barCurveAngle) - halfwayAngleD;
-				barClone.transform.localPosition = new Vector3(Mathf.Sin(thisBarAngleR) * curveRadius, 0, Mathf.Cos(thisBarAngleR) * curveRadius) + curveCentreVector;
-				barClone.transform.localRotation = Quaternion.Euler(barXRotation, thisBarAngleD, 0);
-			}
-			else //standard positioning
-			{
-				barClone.transform.localPosition = new Vector3(i * (1 + barXSpacing) - midPoint, 0, 0);
-			}
-
-			bars[i] = barClone.transform;
+			bars[i] = bar;
 		}
 
 		highestLogFreq = Mathf.Log(barAmount + 1, 2); //gets the highest possible logged frequency, used to calculate which sample of the spectrum to use for a bar
@@ -292,7 +280,7 @@ public class BarManager : MonoBehaviour
 
 		for (int i = 0; i < bars.Length; i++)
 		{
-			Transform bar = bars[i];
+			Bar bar = bars[i];
 
 			float value;
 			float trueSampleIndex;
@@ -359,7 +347,8 @@ public class BarManager : MonoBehaviour
 				newYScale = Mathf.Lerp(oldYScale, Mathf.Max(value * barYScale, barMinYScale), decayDamp);
 			}
 
-			bar.localScale = new Vector3(barXScale, newYScale, 1);
+			bar.transform.localScale = new Vector3(barXScale, newYScale, 1);
+			bar.TargetGraphic.color = Color.Lerp(colorMin, colorMax, value);
 
 			oldYScales[i] = newYScale;
 
