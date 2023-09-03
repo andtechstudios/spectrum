@@ -177,9 +177,11 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'SONG TITLE
+  m_text: 'Artist
 
-    ARTIST NAME'
+    Title
+
+    Spooky Tune Jam 2023'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -630,7 +632,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a89cc0571b78ef4588b77cdfc1fa542, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  clipOverride: {fileID: 8300000, guid: ed8861bf68294a643b78b817eaeba453, type: 3}
+  clipOverride: {fileID: 8300000, guid: 083309fef1f0e9a47a01b7dab3f6f44f, type: 3}
   audioSource: {fileID: 1624406247}
   samplesLengthSize: 9
   window: 1
