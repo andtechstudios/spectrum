@@ -605,7 +605,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a89cc0571b78ef4588b77cdfc1fa542, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  clipOverride: {fileID: 8300000, guid: 083309fef1f0e9a47a01b7dab3f6f44f, type: 3}
+  clipOverride: {fileID: 8300000, guid: ed8861bf68294a643b78b817eaeba453, type: 3}
   audioSource: {fileID: 1073279696}
   barManager: {fileID: 1561388118}
   numSamplesFactor: 8
