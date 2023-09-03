@@ -54,7 +54,6 @@ namespace App
 			int n = 1 << samplesLengthSize;
 			spectrum = new float[n];
 			bands = new float[bandCount];
-			spectrumWidget.Init(bandCount);
 
 			yield return DoConfig();
 
@@ -125,6 +124,13 @@ namespace App
 			{
 				Debug.LogError("Couldn't locate audio file: audio.flac, audio.wav, audio.mp3");
 			}
+		}
+
+		IEnumerator DoUI()
+		{
+			spectrumWidget.Init(bandCount);
+
+			yield break;
 		}
 
 		private void FixedUpdate()
