@@ -298,7 +298,7 @@ public class BarManager : MonoBehaviour
 				newYScale = Mathf.Lerp(oldYScale, Mathf.Max(value * barYScale, barMinYScale), decayDamp);
 			}
 
-			bar.transform.localScale = new Vector3(barXScale, newYScale, 1);
+			bar.transform.localScale = new Vector3(barXScale, newYScale + 200, 1);
 			bar.TargetGraphic.color = Color.Lerp(colorMin, colorMax, value);
 
 			oldYScales[i] = newYScale;
