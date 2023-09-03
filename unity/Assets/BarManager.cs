@@ -104,22 +104,6 @@ public class BarManager : MonoBehaviour
 	[Tooltip("Stretches the bars sideways.")]
 	public float barXScale = 1;
 	/// <summary>
-	/// Increases the spacing between bars.
-	/// </summary>
-	[Tooltip("Increases the spacing between bars.")]
-	public float barXSpacing = 0;
-	/// <summary>
-	/// Bends the Spectrum using a given angle.
-	/// </summary>
-	[Range(0, 360)]
-	[Tooltip("Bends the Spectrum using a given angle. Set to 360 for a circle.")]
-	public float barCurveAngle = 0;
-	/// <summary>
-	/// Rotates the Spectrum inwards or outwards. Especially useful when using barCurveAngle.
-	/// </summary>
-	[Tooltip("Rotates the Spectrum inwards or outwards. Especially useful when using barCurveAngle.")]
-	public float barXRotation = 0;
-	/// <summary>
 	/// The amount of dampening used when the new scale is higher than the bar's existing scale. Must be between 0 (slowest) and 1 (fastest).
 	/// </summary>
 	[Range(0, 1)]
@@ -134,11 +118,6 @@ public class BarManager : MonoBehaviour
 	#endregion
 
 	#region COLOR PROPERTIES
-	/// <summary>
-	/// Determines whether to apply a color gradient on the bars, or just use colorMin as a solid color.
-	/// </summary>
-	[Tooltip("Determines whether to apply a color gradient on the bars, or just use a solid color.")]
-	public bool useColorGradient = false;
 	/// <summary>
 	/// The minimum (low value) color if useColorGradient is true, else the solid color to use.
 	/// </summary>
@@ -217,29 +196,11 @@ public class BarManager : MonoBehaviour
 		oldYScales = new float[barAmount];
 		oldColorValues = new float[barAmount];
 
-		float spectrumLength = barAmount * (1 + barXSpacing);
-		float midPoint = spectrumLength / 2;
-
-		//spectrum bending calculations
-		float curveAngleRads = 0, curveRadius = 0, halfwayAngleR = 0, halfwayAngleD = 0;
-		Vector3 curveCentreVector = Vector3.zero;
-		if (barCurveAngle > 0)
-		{
-			curveAngleRads = (barCurveAngle / 360) * (2 * Mathf.PI);
-			curveRadius = spectrumLength / curveAngleRads;
-
-			halfwayAngleR = curveAngleRads / 2;
-			halfwayAngleD = barCurveAngle / 2;
-			curveCentreVector = new Vector3(0, 0, 1 * -curveRadius);
-			if (barCurveAngle == 360)
-				curveCentreVector = new Vector3(0, 0, 0);
-		}
-
 		//bar instantiation loop
 		for (int i = 0; i < barAmount; i++)
 		{
 			var bar = Instantiate(barPrefab, barsFolder); //create the bars and assign the parent
-			bar.transform.localEulerAngles = new Vector3(0f, 0f, (float)i / barAmount * 360f);
+			bar.transform.localEulerAngles = new Vector3(0f, 0f, -(float)i / barAmount * 360f);
 
 			bars[i] = bar;
 		}
