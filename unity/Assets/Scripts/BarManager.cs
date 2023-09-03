@@ -18,21 +18,6 @@ public class BarManager : MonoBehaviour
 
 	#region SAMPLING PROPERTIES
 	/// <summary>
-	/// The audio channel to use when sampling.
-	/// </summary>
-	[Tooltip("The audio channel to use when sampling.")]
-	public int sampleChannel = 0;
-	/// <summary>
-	/// The number of samples to use when sampling. Must be a power of two.
-	/// </summary>
-	[Tooltip("The number of samples to use when sampling. Must be a power of two.")]
-	public int numSamples = 256;
-	/// <summary>
-	/// The FFTWindow to use when sampling.
-	/// </summary>
-	[Tooltip("The FFTWindow to use when sampling.")]
-	public FFTWindow windowUsed = FFTWindow.BlackmanHarris;
-	/// <summary>
 	/// If true, audio data is scaled logarithmically.
 	/// </summary>
 	[Tooltip("If true, audio data is scaled logarithmically.")]
@@ -139,14 +124,7 @@ public class BarManager : MonoBehaviour
 
 	void Start()
 	{
-		RebuildSpectrum();
-	}
-
-	/// <summary>
-	/// Rebuilds this instance of Spectrum, applying any changes.
-	/// </summary>
-	public void RebuildSpectrum()
-	{
+		var numSamples = Program.Instance.SamplingCount;
 		numSamples = Mathf.ClosestPowerOfTwo(numSamples);
 #if WEB_MODE
       numSamples = SSWebInteract.SetFFTSize(numSamples);
@@ -180,7 +158,7 @@ public class BarManager : MonoBehaviour
 
 	public void OnFixedUpdate()
 	{
-		SimpleSpectrumApi.GetSpectrumData(spectrum, sampleChannel, windowUsed);
+		SimpleSpectrumApi.GetSpectrumData(spectrum, (int)Program.Instance.SamplingChannel, Program.Instance.SamplingWindow);
 
 #if WEB_MODE
       float freqLim = frequencyLimitHigh * 0.76f; //AnalyserNode.getFloatFrequencyData doesn't fill the array, for some reason

@@ -941,6 +941,7 @@ GameObject:
   - component: {fileID: 1561388115}
   - component: {fileID: 1561388114}
   - component: {fileID: 1561388116}
+  - component: {fileID: 1561388118}
   - component: {fileID: 1561388117}
   m_Layer: 0
   m_Name: Runtime
@@ -961,12 +962,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a89cc0571b78ef4588b77cdfc1fa542, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  barManager: {fileID: 1561388118}
   clipOverride: {fileID: 8300000, guid: 083309fef1f0e9a47a01b7dab3f6f44f, type: 3}
   audioSource: {fileID: 1073279696}
   audioListener: {fileID: 1561388116}
-  samplesLengthSize: 12
+  samplingSizeFactor: 10
   bandCount: 40
-  window: 1
+  samplingWindow: 0
+  samplingChannel: 0
   songInfoText: {fileID: 123838653}
   logoTransform: {fileID: 1875067156}
   spectrumWidget: {fileID: 1745896894}
@@ -1005,6 +1008,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f1238756f35eac42902042e06463e42, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1561388118
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1561388113}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e299b0eb6398a01448d00ed3542ab86a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  useLogarithmicFrequency: 1
+  multiplyByFrequency: 1
+  frequencyLimitLow: 10
+  frequencyLimitHigh: 11025
+  bandCount: 75
+  barXScale: 90
+  barMinYScale: 350
+  barYMaxScale: 800
+  barPrefab: {fileID: 2266003268822355920, guid: fa8cf68da22ba364f8b0d5f2abec99e8,
+    type: 3}
+  barsFolder: {fileID: 1745896893}
+  decaySpeed: 4
+  colorMin: {r: 0.20624208, g: 0, b: 1, a: 1}
+  colorMax: {r: 1, g: 0.5185516, b: 0, a: 1}
 --- !u!1 &1745896892
 GameObject:
   m_ObjectHideFlags: 0
@@ -1088,67 +1117,6 @@ MonoBehaviour:
     m_ColorSpace: -1
     m_NumColorKeys: 2
     m_NumAlphaKeys: 2
---- !u!1 &1777242732
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1777242734}
-  - component: {fileID: 1777242733}
-  m_Layer: 0
-  m_Name: Bars
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1777242733
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1777242732}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e299b0eb6398a01448d00ed3542ab86a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  sampleChannel: 0
-  numSamples: 512
-  windowUsed: 2
-  useLogarithmicFrequency: 1
-  multiplyByFrequency: 1
-  frequencyLimitLow: 10
-  frequencyLimitHigh: 11025
-  bandCount: 75
-  barXScale: 90
-  barMinYScale: 350
-  barYMaxScale: 800
-  barPrefab: {fileID: 2266003268822355920, guid: fa8cf68da22ba364f8b0d5f2abec99e8,
-    type: 3}
-  barsFolder: {fileID: 1745896893}
-  decaySpeed: 4
-  colorMin: {r: 0.20624208, g: 0, b: 1, a: 1}
-  colorMax: {r: 1, g: 0.5185516, b: 0, a: 1}
---- !u!4 &1777242734
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1777242732}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!1 &1875067155
 GameObject:
   m_ObjectHideFlags: 0
@@ -1311,7 +1279,6 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 1561388115}
-  - {fileID: 1777242734}
   - {fileID: 1073279695}
   - {fileID: 2034563111}
   - {fileID: 1325687152}

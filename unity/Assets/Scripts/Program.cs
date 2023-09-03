@@ -9,9 +9,18 @@ using UnityEngine.Networking;
 namespace App
 {
 
+	public enum SampleChannel
+	{
+		PingPong = -1,
+		Left = 0,
+		Right = 1,
+	}
+
 	public class Program : MonoBehaviour
 	{
 		public static Program Instance { get; private set; }
+
+		public BarManager barManager;
 
 		[Header("Program Settings")]
 		[SerializeField]
@@ -22,15 +31,21 @@ namespace App
 		[SerializeField]
 		private AudioListener audioListener;
 
-		public int SampleSize => 1 << samplesLengthSize;
+		public int SamplingCount => 1 << samplingSizeFactor;
 		[Header("Spectrum Settings")]
 		[SerializeField]
-		[Range(6f, 13f)]
-		private int samplesLengthSize = 6;
-		[Range(32, 100)]
-		public int bandCount;
+		[Range(6f, 12f)]
+		private int samplingSizeFactor = 10;
+		public int BandCount => bandCount;
 		[SerializeField]
-		private FFTWindow window;
+		[Range(32, 100)]
+		private int bandCount = 64;
+		public FFTWindow SamplingWindow => samplingWindow;
+		[SerializeField]
+		private FFTWindow samplingWindow = FFTWindow.Rectangular;
+		public SampleChannel SamplingChannel => samplingChannel;
+		[SerializeField]
+		private SampleChannel samplingChannel = SampleChannel.Left;
 
 		[Header("UI Settings")]
 		[SerializeField]
@@ -51,6 +66,22 @@ namespace App
 		private void OnDisable()
 		{
 			Instance = Instance == this ? null : Instance;
+		}
+
+		private IEnumerator Start()
+		{
+			songInfoText.color = Color.clear;
+
+			yield return DoConfig();
+
+			songInfoText.text = $"{config.artist}\n\"{config.title}\"\nSpooky Tune Jam 2023";
+
+			yield return DoAudio();
+
+
+			StartCoroutine(FadeIn());
+
+			//yield return DoUI();
 		}
 
 		IEnumerator FadeIn()
@@ -79,21 +110,6 @@ namespace App
 				songInfoText.color = new Color(1f, 1f, 1f, t / fadeDuration);
 			}
 			songInfoText.color = Color.white;
-		}
-
-		private IEnumerator Start()
-		{
-			songInfoText.color = Color.clear;
-
-			yield return DoConfig();
-
-			songInfoText.text = $"{config.artist}\n\"{config.title}\"\nSpooky Tune Jam 2023";
-
-			yield return DoAudio();
-
-			StartCoroutine(FadeIn());
-
-			//yield return DoUI();
 		}
 
 		IEnumerator DoConfig()
