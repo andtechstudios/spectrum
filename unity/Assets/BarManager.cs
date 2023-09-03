@@ -159,13 +159,9 @@ public class BarManager : MonoBehaviour
 
 
 	float[] spectrum;
-
-	//float lograithmicAmplitudePower = 2, multiplyByFrequencyPower = 1.5f;
-	Bar[] bars;
 	float[] oldYScales; //also optimisation
-	float[] oldColorValues; //...optimisation
-
 	float highestLogFreq, frequencyScaleFactor; //multiplier to ensure that the frequencies stretch to the highest record in the array.
+	Bar[] bars;
 
 	void Start()
 	{
@@ -177,24 +173,17 @@ public class BarManager : MonoBehaviour
 	/// </summary>
 	public void RebuildSpectrum()
 	{
-		//clear all the existing children
-		int childs = transform.childCount;
-		for (int i = 0; i < childs; i++)
-		{
-			Destroy(transform.GetChild(i).gameObject);
-		}
-
 		numSamples = Mathf.ClosestPowerOfTwo(numSamples);
-
 #if WEB_MODE
-        numSamples = SSWebInteract.SetFFTSize(numSamples);
+      numSamples = SSWebInteract.SetFFTSize(numSamples);
 #endif
 
 		//initialise arrays
 		spectrum = new float[numSamples];
 		bars = new Bar[barAmount];
 		oldYScales = new float[barAmount];
-		oldColorValues = new float[barAmount];
+		highestLogFreq = Mathf.Log(barAmount + 1, 2); //gets the highest possible logged frequency, used to calculate which sample of the spectrum to use for a bar
+		frequencyScaleFactor = 1.0f / (AudioSettings.outputSampleRate / 2) * numSamples;
 
 		//bar instantiation loop
 		for (int i = 0; i < barAmount; i++)
@@ -204,9 +193,6 @@ public class BarManager : MonoBehaviour
 
 			bars[i] = bar;
 		}
-
-		highestLogFreq = Mathf.Log(barAmount + 1, 2); //gets the highest possible logged frequency, used to calculate which sample of the spectrum to use for a bar
-		frequencyScaleFactor = 1.0f / (AudioSettings.outputSampleRate / 2) * numSamples;
 	}
 
 	void Update()
