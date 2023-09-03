@@ -157,23 +157,6 @@ public class BarManager : MonoBehaviour
 	/// </summary>
 	[Tooltip("The maximum (high value) color.")]
 	public Color colorMax = Color.white;
-	/// <summary>
-	/// The curve that determines the interpolation between colorMin and colorMax.
-	/// </summary>
-	[Tooltip("The curve that determines the interpolation between colorMin and colorMax.")]
-	public AnimationCurve colorValueCurve = new AnimationCurve(new Keyframe[] { new Keyframe(0, 0), new Keyframe(1, 1) });
-	/// <summary>
-	/// The amount of dampening used when the new color value is higher than the existing color value. Must be between 0 (slowest) and 1 (fastest).
-	/// </summary>
-	[Range(0, 1)]
-	[Tooltip("The amount of dampening used when the new color value is higher than the existing color value.")]
-	public float colorAttackDamp = 1;
-	/// <summary>
-	/// The amount of dampening used when the new color value is lower than the existing color value. Must be between 0 (slowest) and 1 (fastest).
-	/// </summary>
-	[Range(0, 1)]
-	[Tooltip("The amount of dampening used when the new color value is lower than the existing color value.")]
-	public float colorDecayDamp = 1;
 	#endregion
 
 	/// <summary>
@@ -208,12 +191,8 @@ public class BarManager : MonoBehaviour
 
 	//float lograithmicAmplitudePower = 2, multiplyByFrequencyPower = 1.5f;
 	Transform[] bars;
-	Material[] barMaterials; //optimisation
 	float[] oldYScales; //also optimisation
 	float[] oldColorValues; //...optimisation
-	int materialValId;
-
-	bool materialColourCanBeUsed = true; //can dynamic material colouring be used?
 
 	float highestLogFreq, frequencyScaleFactor; //multiplier to ensure that the frequencies stretch to the highest record in the array.
 
@@ -243,11 +222,8 @@ public class BarManager : MonoBehaviour
 		//initialise arrays
 		spectrum = new float[numSamples];
 		bars = new Transform[barAmount];
-		barMaterials = new Material[barAmount];
 		oldYScales = new float[barAmount];
 		oldColorValues = new float[barAmount];
-
-		materialColourCanBeUsed = true;
 
 		float spectrumLength = barAmount * (1 + barXSpacing);
 		float midPoint = spectrumLength / 2;
@@ -288,35 +264,7 @@ public class BarManager : MonoBehaviour
 			}
 
 			bars[i] = barClone.transform;
-			Renderer rend = barClone.transform.GetChild(0).GetComponent<Renderer>();
-			if (rend != null)
-			{
-				barMaterials[i] = rend.material;
-			}
-			else
-			{
-				Image img = barClone.transform.GetChild(0).GetComponent<Image>();
-				if (img != null)
-				{
-					img.material = new Material(img.material);
-					barMaterials[i] = img.material;
-				}
-				else
-				{
-					if (materialColourCanBeUsed)
-					{
-						Debug.LogWarning("Warning from SimpleSpectrum: The Bar Prefab you're using doesn't have a Renderer or Image component as its first child. Dynamic colouring will not work.");
-						materialColourCanBeUsed = false;
-					}
-				}
-			}
-
-			int color1Id = Shader.PropertyToID("_Color1"), color2Id = Shader.PropertyToID("_Color2");
-			barMaterials[i].SetColor(color1Id, colorMin);
-			barMaterials[i].SetColor(color2Id, colorMax);
 		}
-
-		materialValId = Shader.PropertyToID("_Val");
 
 		highestLogFreq = Mathf.Log(barAmount + 1, 2); //gets the highest possible logged frequency, used to calculate which sample of the spectrum to use for a bar
 		frequencyScaleFactor = 1.0f / (AudioSettings.outputSampleRate / 2) * numSamples;
@@ -326,7 +274,7 @@ public class BarManager : MonoBehaviour
 	{
 
 #if WEB_MODE
-          SSWebInteract.GetSpectrumData(samples); //get the spectrum data from the JS lib
+      SSWebInteract.GetSpectrumData(samples); //get the spectrum data from the JS lib
 #else
 		AudioListener.GetSpectrumData(samples, channel, window);
 #endif
@@ -337,7 +285,7 @@ public class BarManager : MonoBehaviour
 		GetSpectrumData(spectrum, sampleChannel, windowUsed);
 
 #if WEB_MODE
-            float freqLim = frequencyLimitHigh * 0.76f; //AnalyserNode.getFloatFrequencyData doesn't fill the array, for some reason
+      float freqLim = frequencyLimitHigh * 0.76f; //AnalyserNode.getFloatFrequencyData doesn't fill the array, for some reason
 #else
 		float freqLim = frequencyLimitHigh;
 #endif
@@ -389,13 +337,12 @@ public class BarManager : MonoBehaviour
 			if (multiplyByFrequency) //multiplies the amplitude by the true sample index
 			{
 #if WEB_MODE
-                    value = value * (Mathf.Log(trueSampleIndex + 1) + 1);  //different due to how the WebAudioAPI outputs spectrum data.
+            value = value * (Mathf.Log(trueSampleIndex + 1) + 1);  //different due to how the WebAudioAPI outputs spectrum data.
 
 #else
 				value = value * (trueSampleIndex + 1);
 #endif
 			}
-
 #if !WEB_MODE
 			value = Mathf.Sqrt(value); //compress the amplitude values by sqrt(x)
 #endif
@@ -417,30 +364,7 @@ public class BarManager : MonoBehaviour
 			oldYScales[i] = newYScale;
 
 			//set colour
-			if (useColorGradient && materialColourCanBeUsed)
-			{
-				float newColorVal = colorValueCurve.Evaluate(value);
-				float oldColorVal = oldColorValues[i];
-
-				if (newColorVal > oldColorVal)
-				{
-					if (colorAttackDamp != 1)
-					{
-						newColorVal = Mathf.Lerp(oldColorVal, newColorVal, colorAttackDamp);
-					}
-				}
-				else
-				{
-					if (colorDecayDamp != 1)
-					{
-						newColorVal = Mathf.Lerp(oldColorVal, newColorVal, colorDecayDamp);
-					}
-				}
-
-				barMaterials[i].SetFloat(materialValId, newColorVal);
-
-				oldColorValues[i] = newColorVal;
-			}
+			Debug.Log("no coloring");
 		}
 	}
 
