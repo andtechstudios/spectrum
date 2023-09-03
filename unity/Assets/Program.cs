@@ -21,6 +21,7 @@ namespace App
 		[SerializeField]
 		private AudioListener audioListener;
 
+		public int SampleSize => 1 << samplesLengthSize;
 		[Header("Spectrum Settings")]
 		[SerializeField]
 		[Range(6f, 13f)]
@@ -29,12 +30,6 @@ namespace App
 		public int bandCount;
 		[SerializeField]
 		private FFTWindow window;
-		[SerializeField]
-		private float energyDecay;
-		[SerializeField]
-		private float barDecay;
-		[SerializeField]
-		private float logScale;
 
 		[Header("UI Settings")]
 		[SerializeField]
@@ -43,14 +38,8 @@ namespace App
 		private RectTransform logoTransform;
 		public SpectrumWidget spectrumWidget;
 
-		[SerializeField]
-		private AnimationCurve spectrumScaling;
-
 		// Storage
 		private Config config;
-		private float energy;
-		private float[] spectrum;
-		private float[] bands;
 
 		private void OnEnable()
 		{
@@ -64,10 +53,6 @@ namespace App
 
 		private IEnumerator Start()
 		{
-			int n = 1 << samplesLengthSize;
-			spectrum = new float[n];
-			bands = new float[bandCount];
-
 			yield return DoConfig();
 
 			songInfoText.text = $"{config.artist}\n\"{config.title}\"\nSpooky Tune Jam 2023";
@@ -144,50 +129,6 @@ namespace App
 			spectrumWidget.Init(bandCount);
 
 			yield break;
-		}
-
-		private void FixedUpdate()
-		{
-			if (audioSource.clip)
-			{
-				AudioListener.GetSpectrumData(spectrum, 0, window);
-
-				var candidateBands = new float[spectrum.Length];
-				var energy = 0f;
-				for (int i = 0; i < bands.Length; i++)
-				{
-					var bucket = Mathf.Clamp(i, 0, bandCount - 1);
-					candidateBands[bucket] = spectrum[i];
-					energy = spectrum[i] * spectrum[i];
-				}
-				energy = Mathf.Sqrt(energy) / 0.015f;
-				this.energy = Mathf.Max(energy, this.energy);
-				this.energy = Mathf.Clamp01(this.energy);
-				for (int i = 0; i < bands.Length; i++)
-				{
-					float logAmplitude = Mathf.Log10(1 + candidateBands[i]) * logScale;
-					logAmplitude = Mathf.Sqrt(logAmplitude);
-
-					var t = (float)i / bandCount;
-					logAmplitude *= spectrumScaling.Evaluate(t);
-
-					bands[i] = Mathf.Max(logAmplitude, bands[i]);
-					bands[i] = Mathf.Clamp01(bands[i]);
-				}
-			}
-		}
-
-		private void Update()
-		{
-			if (audioSource.clip)
-			{
-				// Decay since last frame
-				energy = Mathf.Max(energy - Time.deltaTime * energyDecay, 0f);
-				for (int i = 0; i < bands.Length; i++)
-				{
-					bands[i] = Mathf.Max(bands[i] - Time.deltaTime * barDecay, 0f);
-				}
-			}
 		}
 	}
 }

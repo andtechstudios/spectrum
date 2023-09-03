@@ -209,152 +209,92 @@ public class BarManager : MonoBehaviour
 		frequencyScaleFactor = 1.0f / (AudioSettings.outputSampleRate / 2) * numSamples;
 	}
 
-	void GetSpectrumData(float[] samples, int channel, FFTWindow window)
-	{
-
-#if WEB_MODE
-      SSWebInteract.GetSpectrumData(samples); //get the spectrum data from the JS lib
-#else
-		AudioListener.GetSpectrumData(samples, channel, window);
-#endif
-	}
-
 	void Update()
 	{
-		GetSpectrumData(spectrum, sampleChannel, windowUsed);
+		if (Program.Instance)
+		{
+			SimpleSpectrumApi.GetSpectrumData(spectrum, sampleChannel, windowUsed);
 
 #if WEB_MODE
       float freqLim = frequencyLimitHigh * 0.76f; //AnalyserNode.getFloatFrequencyData doesn't fill the array, for some reason
 #else
-		float freqLim = frequencyLimitHigh;
+			float freqLim = frequencyLimitHigh;
 #endif
 
-		for (int i = 0; i < bars.Length; i++)
-		{
-			Bar bar = bars[i];
-
-			float value;
-			float trueSampleIndex;
-
-			//GET SAMPLES
-			if (useLogarithmicFrequency)
+			for (int i = 0; i < bars.Length; i++)
 			{
-				//LOGARITHMIC FREQUENCY SAMPLING
+				Bar bar = bars[i];
 
-				//trueSampleIndex = highFrequencyTrim * (highestLogFreq - Mathf.Log(barAmount + 1 - i, 2)) * logFreqMultiplier; //old version
+				float value;
+				float trueSampleIndex;
 
-				trueSampleIndex = Mathf.Lerp(frequencyLimitLow, freqLim, (highestLogFreq - Mathf.Log(barAmount + 1 - i, 2)) / highestLogFreq) * frequencyScaleFactor;
+				//GET SAMPLES
+				if (useLogarithmicFrequency)
+				{
+					//LOGARITHMIC FREQUENCY SAMPLING
 
-				//'logarithmic frequencies' just means we want to bias to the lower frequencies.
-				//by doing log2(max(i)) - log2(max(i) - i), we get a flipped log graph
-				//(make a graph of log2(64)-log2(64-x) to see what I mean)
-				//this isn't finished though, because that graph doesn't actually map the bar index (x) to the spectrum index (y).
-				//then we divide by highestLogFreq to make the graph to map 0-barAmount on the x axis to 0-1 in the y axis.
-				//we then use this to Lerp between frequency limits, and then an index is calculated.
-				//also 1 gets added to barAmount pretty much everywhere, because without it, the log hits (barAmount-1,max(freq))
+					//trueSampleIndex = highFrequencyTrim * (highestLogFreq - Mathf.Log(barAmount + 1 - i, 2)) * logFreqMultiplier; //old version
 
-			}
-			else
-			{
-				//LINEAR (SCALED) FREQUENCY SAMPLING 
-				//trueSampleIndex = i * linearSampleStretch; //don't like this anymore
+					trueSampleIndex = Mathf.Lerp(frequencyLimitLow, freqLim, (highestLogFreq - Mathf.Log(barAmount + 1 - i, 2)) / highestLogFreq) * frequencyScaleFactor;
 
-				trueSampleIndex = Mathf.Lerp(frequencyLimitLow, freqLim, ((float)i) / barAmount) * frequencyScaleFactor;
-				//sooooo this one's gotten fancier...
-				//firstly a lerp is used between frequency limits to get the 'desired frequency', then it's divided by the outputSampleRate (/2, who knows why) to get its location in the array, then multiplied by numSamples to get an index instead of a fraction.
+					//'logarithmic frequencies' just means we want to bias to the lower frequencies.
+					//by doing log2(max(i)) - log2(max(i) - i), we get a flipped log graph
+					//(make a graph of log2(64)-log2(64-x) to see what I mean)
+					//this isn't finished though, because that graph doesn't actually map the bar index (x) to the spectrum index (y).
+					//then we divide by highestLogFreq to make the graph to map 0-barAmount on the x axis to 0-1 in the y axis.
+					//we then use this to Lerp between frequency limits, and then an index is calculated.
+					//also 1 gets added to barAmount pretty much everywhere, because without it, the log hits (barAmount-1,max(freq))
 
-			}
+				}
+				else
+				{
+					//LINEAR (SCALED) FREQUENCY SAMPLING 
+					//trueSampleIndex = i * linearSampleStretch; //don't like this anymore
 
-			//the true sample is usually a decimal, so we need to lerp between the floor and ceiling of it.
+					trueSampleIndex = Mathf.Lerp(frequencyLimitLow, freqLim, ((float)i) / barAmount) * frequencyScaleFactor;
+					//sooooo this one's gotten fancier...
+					//firstly a lerp is used between frequency limits to get the 'desired frequency', then it's divided by the outputSampleRate (/2, who knows why) to get its location in the array, then multiplied by numSamples to get an index instead of a fraction.
 
-			int sampleIndexFloor = Mathf.FloorToInt(trueSampleIndex);
-			sampleIndexFloor = Mathf.Clamp(sampleIndexFloor, 0, spectrum.Length - 2); //just keeping it within the spectrum array's range
+				}
 
-			value = Mathf.SmoothStep(spectrum[sampleIndexFloor], spectrum[sampleIndexFloor + 1], trueSampleIndex - sampleIndexFloor); //smoothly interpolate between the two samples using the true index's decimal.
+				//the true sample is usually a decimal, so we need to lerp between the floor and ceiling of it.
 
-			//MANIPULATE & APPLY SAMPLES
-			if (multiplyByFrequency) //multiplies the amplitude by the true sample index
-			{
+				int sampleIndexFloor = Mathf.FloorToInt(trueSampleIndex);
+				sampleIndexFloor = Mathf.Clamp(sampleIndexFloor, 0, spectrum.Length - 2); //just keeping it within the spectrum array's range
+
+				value = Mathf.SmoothStep(spectrum[sampleIndexFloor], spectrum[sampleIndexFloor + 1], trueSampleIndex - sampleIndexFloor); //smoothly interpolate between the two samples using the true index's decimal.
+
+				//MANIPULATE & APPLY SAMPLES
+				if (multiplyByFrequency) //multiplies the amplitude by the true sample index
+				{
 #if WEB_MODE
             value = value * (Mathf.Log(trueSampleIndex + 1) + 1);  //different due to how the WebAudioAPI outputs spectrum data.
 
 #else
-				value = value * (trueSampleIndex + 1);
+					value = value * (trueSampleIndex + 1);
 #endif
-			}
+				}
 #if !WEB_MODE
-			value = Mathf.Sqrt(value); //compress the amplitude values by sqrt(x)
+				value = Mathf.Sqrt(value); //compress the amplitude values by sqrt(x)
 #endif
 
-			//DAMPENING
-			//Vector3 oldScale = bar.localScale;
-			float oldYScale = oldYScales[i], newYScale;
-			if (value * barYScale > oldYScale)
-			{
-				newYScale = Mathf.Lerp(oldYScale, Mathf.Max(value * barYScale, barMinYScale), attackDamp);
+				//DAMPENING
+				//Vector3 oldScale = bar.localScale;
+				float oldYScale = oldYScales[i], newYScale;
+				if (value * barYScale > oldYScale)
+				{
+					newYScale = Mathf.Lerp(oldYScale, Mathf.Max(value * barYScale, barMinYScale), attackDamp);
+				}
+				else
+				{
+					newYScale = Mathf.Lerp(oldYScale, Mathf.Max(value * barYScale, barMinYScale), decayDamp);
+				}
+
+				bar.transform.localScale = new Vector3(barXScale, newYScale + 200, 1);
+				bar.TargetGraphic.color = Color.Lerp(colorMin, colorMax, value);
+
+				oldYScales[i] = newYScale;
 			}
-			else
-			{
-				newYScale = Mathf.Lerp(oldYScale, Mathf.Max(value * barYScale, barMinYScale), decayDamp);
-			}
-
-			bar.transform.localScale = new Vector3(barXScale, newYScale + 200, 1);
-			bar.TargetGraphic.color = Color.Lerp(colorMin, colorMax, value);
-
-			oldYScales[i] = newYScale;
 		}
-	}
-
-	/// <summary>
-	/// Returns a logarithmically scaled and proportionate array of spectrum data from the AudioListener.
-	/// </summary>
-	/// <param name="spectrumSize">The size of the returned array.</param>
-	/// <param name="sampleSize">The size of sample to take from the AudioListener. Must be a power of two. Will only be used in WebGL if no samples have been taken yet.</param>
-	/// <param name="windowUsed">The FFTWindow to use when sampling. Unused in WebGL.</param>
-	/// <param name="channelUsed">The audio channel to use when sampling. Unused in WebGL.</param>
-	/// <returns>A logarithmically scaled and proportionate array of spectrum data from the AudioListener.</returns>
-	public static float[] GetLogarithmicSpectrumData(int spectrumSize, int sampleSize, FFTWindow windowUsed = FFTWindow.BlackmanHarris, int channelUsed = 0)
-	{
-#if WEB_MODE
-        sampleSize = SSWebInteract.SetFFTSize(sampleSize); //set the WebGL sampleSize if not already done, otherwise get the current sample size.
-#endif
-		float[] spectrum = new float[spectrumSize];
-
-		channelUsed = Mathf.Clamp(channelUsed, 0, 1);
-
-		float[] samples = new float[Mathf.ClosestPowerOfTwo(sampleSize)];
-
-#if WEB_MODE
-        SSWebInteract.GetSpectrumData(samples); //get the spectrum data from the JS lib
-#else
-		AudioListener.GetSpectrumData(samples, channelUsed, windowUsed);
-#endif
-
-		float highestLogSampleFreq = Mathf.Log(spectrum.Length + 1, 2); //gets the highest possible logged frequency, used to calculate which sample of the spectrum to use for a bar
-
-		float logSampleFreqMultiplier = sampleSize / highestLogSampleFreq;
-
-		for (int i = 0; i < spectrum.Length; i++) //for each float in the output
-		{
-
-			float trueSampleIndex = (highestLogSampleFreq - Mathf.Log(spectrum.Length + 1 - i, 2)) * logSampleFreqMultiplier; //gets the index equiv of the logified frequency
-
-			//the true sample is usually a decimal, so we need to lerp between the floor and ceiling of it.
-
-			int sampleIndexFloor = Mathf.FloorToInt(trueSampleIndex);
-			sampleIndexFloor = Mathf.Clamp(sampleIndexFloor, 0, samples.Length - 2); //just keeping it within the spectrum array's range
-
-			float value = Mathf.SmoothStep(spectrum[sampleIndexFloor], spectrum[sampleIndexFloor + 1], trueSampleIndex - sampleIndexFloor); //smoothly interpolate between the two samples using the true index's decimal.
-
-#if WEB_MODE
-            value = value * (Mathf.Log(trueSampleIndex + 1) + 1); //different due to how the WebAudioAPI outputs spectrum data.
-
-#else
-			value = value * (trueSampleIndex + 1); //multiply value by its position to make it proportionate
-			value = Mathf.Sqrt(value); //compress the amplitude values by sqrt(x)
-#endif
-			spectrum[i] = value;
-		}
-		return spectrum;
 	}
 }

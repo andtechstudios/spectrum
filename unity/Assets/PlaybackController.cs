@@ -8,7 +8,7 @@ namespace App
 
 		private void Update()
 		{
-			if (Program.Instance)
+			if (Program.Instance && Program.Instance.AudioSource.clip)
 			{
 				var duration = Program.Instance.AudioSource.clip.length;
 				var audioSource = Program.Instance.AudioSource;
