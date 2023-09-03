@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Runtime.InteropServices;
 using System.Security.Policy;
 using TMPro;
 using UnityEngine;
@@ -40,6 +41,7 @@ namespace App
 
 		// Storage
 		private Config config;
+		private float[] samples = new float[256];
 
 		private void OnEnable()
 		{
@@ -57,10 +59,16 @@ namespace App
 			var fadeDuration = 3f;
 
 			// Wait for browser to allow audio
-			if (AudioListener.pause)
+			do
 			{
+				if (SimpleSpectrumApi.GetLoudness(samples, 0) > Mathf.Epsilon)
+				{
+					break;
+				}
+
 				yield return new WaitForSeconds(1f);
 			}
+			while (true);
 
 			// Delay, then fade in
 			yield return new WaitForSeconds(delay);

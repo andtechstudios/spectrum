@@ -10,6 +10,7 @@ using UnityEngine;
 
 namespace App
 {
+
 	public static class SimpleSpectrumApi
 	{
 
