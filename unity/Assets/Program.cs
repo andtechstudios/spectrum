@@ -74,10 +74,10 @@ namespace App
 		{
 			yield return DoConfig();
 
-			//songInfoText.text = $"{config.artist}\n\"{config.title}\"\nSpooky Tune Jam 2023";
+			songInfoText.text = $"{config.artist}\n\"{config.title}\"\nSpooky Tune Jam 2023";
 
 			yield return DoAudio();
-			yield return DoUI();
+			//yield return DoUI();
 		}
 
 		IEnumerator DoConfig()
