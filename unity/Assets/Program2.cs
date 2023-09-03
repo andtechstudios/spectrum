@@ -9,10 +9,14 @@ namespace App
 		public float loudness;
 		public GameObject gameObject;
 		public int sampleAmount = 256;
+		public int barCount;
+
+		public SpectrumWidget spectrumWidget;
 
 		private void Start()
 		{
 			sampleAmount = SSWebInteract.SetFFTSize(sampleAmount);
+			spectrumWidget.Init(barCount);
 		}
 
 		private void FixedUpdate()

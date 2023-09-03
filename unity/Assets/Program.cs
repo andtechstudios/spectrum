@@ -38,40 +38,24 @@ namespace App
 		private TMP_Text songInfoText;
 		[SerializeField]
 		private RectTransform logoTransform;
-		[SerializeField]
-		private RectTransform barsTransform;
-		[SerializeField]
-		private Bar barPrefab;
-		[SerializeField]
-		[Range(200f, 600f)]
-		private int minimumBarLength;
-		[SerializeField]
-		[Range(500f, 800f)]
-		private int maximumBarLength;
+		public SpectrumWidget spectrumWidget;
 
 		[SerializeField]
 		private AnimationCurve spectrumScaling;
-		[SerializeField]
-		private Gradient barColors;
 
 		// Storage
 		private Config config;
 		private float energy;
 		private float[] spectrum;
 		private float[] bands;
-		private Bar[] bars;
-
-		private void Awake()
-		{
-			int n = 1 << samplesLengthSize;
-
-			spectrum = new float[n];
-			bands = new float[bandCount];
-			bars = new Bar[bandCount];
-		}
 
 		private IEnumerator Start()
 		{
+			int n = 1 << samplesLengthSize;
+			spectrum = new float[n];
+			bands = new float[bandCount];
+			spectrumWidget.Init(bandCount);
+
 			yield return DoConfig();
 
 			songInfoText.text = $"{config.artist}\n\"{config.title}\"\nSpooky Tune Jam 2023";
@@ -143,18 +127,6 @@ namespace App
 			}
 		}
 
-		IEnumerator DoUI()
-		{
-			for (int i = 0; i < bands.Length; i++)
-			{
-				var bar = GameObject.Instantiate(barPrefab, barsTransform);
-				bar.transform.localEulerAngles = new Vector3(0f, 0f, -(float)i / bands.Length * 360f);
-				bars[i] = bar;
-			}
-
-			yield break;
-		}
-
 		private void FixedUpdate()
 		{
 			if (audioSource.clip)
@@ -196,18 +168,6 @@ namespace App
 				{
 					bands[i] = Mathf.Max(bands[i] - Time.deltaTime * barDecay, 0f);
 				}
-
-				// Update
-				for (int i = 0; i < bands.Length; i++)
-				{
-					var a = bands[i];
-
-					bars[i].transform.localScale = new Vector3(1f, Mathf.Lerp(minimumBarLength, maximumBarLength, a), 1f);
-					bars[i].TargetGraphic.color = barColors.Evaluate(a);
-				}
-
-				var scale = Mathf.Lerp(0.95f, 1f, energy * energy);
-				logoTransform.localScale = new Vector3(scale, scale, scale);
 			}
 		}
 	}
