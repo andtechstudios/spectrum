@@ -68,7 +68,7 @@ namespace Spectrum
 
 		public void OnFixedUpdate()
 		{
-			if (Program.Instance.IsAudioAllowed)
+			if (Program.Instance.HasAcquiredFocus)
 			{
 				SimpleSpectrumApi.GetSpectrumData(spectrum, (int)Program.Instance.SamplingChannel, Program.Instance.SamplingWindow);
 

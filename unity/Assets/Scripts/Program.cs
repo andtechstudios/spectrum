@@ -1,3 +1,7 @@
+#if UNITY_WEBGL && !UNITY_EDITOR
+#define WEB_MODE //different to UNITY_WEBGL, as we still want functionality in the Editor!
+#endif
+
 using System;
 using System.Collections;
 using TMPro;
@@ -12,7 +16,7 @@ namespace Spectrum
 	{
 		public static Program Instance { get; private set; }
 
-		public bool IsAudioAllowed { get; private set; } = false;
+		public bool HasAcquiredFocus { get; private set; } = false;
 		public float Loudness { get; private set; }
 
 		[Header("Program Settings")]
@@ -23,6 +27,8 @@ namespace Spectrum
 		private AudioSource audioSource;
 		[SerializeField]
 		private BarManager barManager;
+		[SerializeField]
+		private bool autoPlay;
 
 		public int NumSamples => 1 << numSamplesFactor;
 		[Header("Sampling Settings")]
@@ -75,6 +81,17 @@ namespace Spectrum
 			Instance = Instance == this ? null : Instance;
 		}
 
+		public void RequestAcquireFocus()
+		{
+			if (HasAcquiredFocus)
+			{
+				return;
+			}
+
+			HasAcquiredFocus = true;
+			audioSource.Play();
+		}
+
 		private IEnumerator Start()
 		{
 			sampler = new Sampler(NumSamples, numBands)
@@ -86,6 +103,11 @@ namespace Spectrum
 				UseLogarithmicFrequency = useLogarithmicFrequency,
 			};
 
+#if WEB_MODE
+			HasAcquiredFocus = false;
+#else
+			HasAcquiredFocus = autoPlay;
+#endif
 			PresetUI();
 
 			yield return DoConfig();
@@ -101,15 +123,11 @@ namespace Spectrum
 		private void FixedUpdate()
 		{
 			Loudness = Mathf.Max(SimpleSpectrumApi.GetLoudness(loudnessBuffer, 0), Loudness);
+			HasAcquiredFocus = HasAcquiredFocus || Loudness > 0.05f;
 
-#if UNITY_WEBGL
-			IsAudioAllowed = IsAudioAllowed || Loudness > 0.1f;
-#else
-			IsAudioAllowed = true;
-#endif
 			sampler?.OnFixedUpdate();
 
-			playGraphic.enabled = !IsAudioAllowed;
+			playGraphic.enabled = !HasAcquiredFocus && (Time.realtimeSinceStartup > 0.666f || !autoPlay);
 		}
 		private void Update()
 		{
@@ -130,7 +148,7 @@ namespace Spectrum
 			// Wait for browser to allow audio
 			do
 			{
-				if (IsAudioAllowed)
+				if (HasAcquiredFocus)
 				{
 					break;
 				}
@@ -205,7 +223,10 @@ namespace Spectrum
 			if (clip)
 			{
 				audioSource.clip = clip;
-				audioSource.Play();
+				if (autoPlay)
+				{
+					audioSource.Play();
+				}
 			}
 			else
 			{
