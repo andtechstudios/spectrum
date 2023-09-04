@@ -133,7 +133,7 @@ GameObject:
   - component: {fileID: 123838654}
   - component: {fileID: 123838653}
   m_Layer: 5
-  m_Name: Info
+  m_Name: Chryon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -272,7 +272,7 @@ GameObject:
   - component: {fileID: 780083619}
   - component: {fileID: 780083618}
   m_Layer: 5
-  m_Name: PlayGraphic
+  m_Name: Icon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -342,7 +342,7 @@ GameObject:
   m_Component:
   - component: {fileID: 889712258}
   m_Layer: 5
-  m_Name: GameObject
+  m_Name: PlayGraphic
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -626,7 +626,7 @@ GameObject:
   - component: {fileID: 1534160692}
   - component: {fileID: 1534160694}
   m_Layer: 5
-  m_Name: Image
+  m_Name: Button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -895,7 +895,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1745896893}
   m_Layer: 5
-  m_Name: SpectrumWidget
+  m_Name: Bars
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
