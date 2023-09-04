@@ -1,5 +1,5 @@
 
-Shader "Unlit/UIAdd" {
+Shader "Andtech/UI Additive" {
 
 	Properties {
 		_MainTex ("Texture", 2D) = "white" {}
@@ -19,7 +19,6 @@ Shader "Unlit/UIAdd" {
 			CGPROGRAM
 			#pragma vertex vert
 			#pragma fragment frag
-			#pragma multi_compile_fog
 			
 			#include "UnityCG.cginc"
 
@@ -31,7 +30,6 @@ Shader "Unlit/UIAdd" {
 
 			struct v2f {
 				float2 uv : TEXCOORD0;
-				UNITY_FOG_COORDS(1)
 				float4 vertex : SV_POSITION;
 				fixed4 color : COLOR;
 			};
@@ -43,14 +41,12 @@ Shader "Unlit/UIAdd" {
 				v2f o;
 				o.vertex = UnityObjectToClipPos(v.vertex);
 				o.uv = TRANSFORM_TEX(v.uv, _MainTex);
-				UNITY_TRANSFER_FOG(o,o.vertex);
 				o.color = v.color;
 				return o;
 			}
 			
 			fixed4 frag (v2f i) : SV_Target {
 				fixed4 col = tex2D(_MainTex, i.uv);
-				UNITY_APPLY_FOG(i.fogCoord, col);
 				return col * i.color;
 			}
 			ENDCG
