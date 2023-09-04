@@ -884,7 +884,7 @@ MonoBehaviour:
   barMinYScale: 350
   barYMaxScale: 800
   colorMin: {r: 0.20624208, g: 0, b: 1, a: 1}
-  colorMax: {r: 1, g: 0.5185516, b: 0, a: 1}
+  colorMax: {r: 1, g: 0.4358646, b: 0, a: 1}
 --- !u!1 &1745896892
 GameObject:
   m_ObjectHideFlags: 0

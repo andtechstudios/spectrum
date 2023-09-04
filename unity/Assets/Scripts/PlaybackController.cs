@@ -15,19 +15,19 @@ namespace Spectrum
 
 				if (Input.GetKeyDown(KeyCode.LeftArrow))
 				{
-					audioSource.time = Mathf.Clamp(audioSource.time - 5f, 0f, duration);
+					audioSource.time = Mathf.Clamp(audioSource.time - 5f, 0f, duration - 0.01f);
 				}
 				if (Input.GetKeyDown(KeyCode.RightArrow))
 				{
-					audioSource.time = Mathf.Clamp(audioSource.time + 5f, 0f, duration);
+					audioSource.time = Mathf.Clamp(audioSource.time + 5f, 0f, duration - 0.01f);
 				}
 				if (Input.GetKeyDown(KeyCode.J))
 				{
-					audioSource.time = Mathf.Clamp(audioSource.time - 10f, 0f, duration);
+					audioSource.time = Mathf.Clamp(audioSource.time - 10f, 0f, duration - 0.01f);
 				}
 				if (Input.GetKeyDown(KeyCode.L))
 				{
-					audioSource.time = Mathf.Clamp(audioSource.time + 10f, 0f, duration);
+					audioSource.time = Mathf.Clamp(audioSource.time + 10f, 0f, duration - 0.01f);
 				}
 
 				for (int i = 0; i < 10; i++)
