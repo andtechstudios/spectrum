@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 025c3e6b7fd9ba24eb514f26946e81b2
+timeCreated: 1544531001
+licenseType: Store
+TextScriptImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 85294
+  packageName: SimpleSpectrum - Free Audio Spectrum Generator (+WebGL!)
+  packageVersion: 2.1
+  assetPath: Assets/SimpleSpectrum/Scripts/WebGLInject.txt
+  uploadId: 282897
