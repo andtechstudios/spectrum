@@ -20,3 +20,6 @@
 | Load Audio from URL | ✅ | ✅ | ✅ | ✅ | Partial* |
 
 > Due to CORS, some devices may reject loading audio files from external URLs.
+
+# Credits
+* [SimpleSpectrum](https://assetstore.unity.com/packages/tools/audio/simplespectrum-free-audio-spectrum-generator-webgl-85294)
