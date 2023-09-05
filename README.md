@@ -1,4 +1,9 @@
+![Movie_012](https://github.com/andtechstudios/spectrum/assets/48300131/68140c77-61e6-46f8-8366-280f5bb372e4)
+
+A WebGL audio visualizer. Just drop in your audio file, and Spectrum will do the rest.
+
 # Usage
+## Deploy Spectrum to itch.io
 1. Download the latest release [here](https://github.com/andtechstudios/spectrum/releases). Extract the download if necessary.
 2. Navigate to the downloaded folder. You should see the following:
 * `Build`
