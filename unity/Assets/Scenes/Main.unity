@@ -874,7 +874,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a89cc0571b78ef4588b77cdfc1fa542, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  clipOverride: {fileID: 8300000, guid: eafd7cc0e6bce0840bceb78a457a23b1, type: 3}
+  clipOverride: {fileID: 0}
   numSamplesFactor: 9
   numBands: 60
   samplingChannel: -1
