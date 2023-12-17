@@ -91,7 +91,7 @@ public class Program : MonoBehaviour
 		var text = string.Empty;
 		text = string.IsNullOrEmpty(config.artist) ? text : text + $"{config.artist}";
 		text = string.IsNullOrEmpty(config.title) ? text : text + $"\n\"{config.title}\"";
-		text += "\nSpooky Tune Jam 2023";
+		text += "\nWinter Mini Tune Jam 2023";
 		chryonText.text = text;
 
 		yield return LoadAudioAsync();
