@@ -24,6 +24,8 @@ namespace App
 
 		private ObjectPool<Box> boxPool;
 
+		public AudioSource coinAudioSource;
+
 		public void Start()
 		{
 			boxPool = new ObjectPool<Box>(createFunc: CreateBox, actionOnDestroy: DestroyBox, actionOnGet: OnGet, actionOnRelease: OnRelease);
@@ -117,6 +119,8 @@ namespace App
 
 			count++;
 			scoreText.text = count.ToString();
+
+			coinAudioSource.Play();
 		}
 	}
 }
