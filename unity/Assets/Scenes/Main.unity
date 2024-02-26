@@ -13,7 +13,7 @@ OcclusionCullingSettings:
 --- !u!104 &2
 RenderSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 9
+  serializedVersion: 10
   m_Fog: 0
   m_FogColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   m_FogMode: 3
@@ -38,13 +38,12 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.37311953, g: 0.38074014, b: 0.3587274, a: 1}
+  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 12
-  m_GIWorkflowMode: 1
   m_GISettings:
     serializedVersion: 2
     m_BounceScale: 1
@@ -182,7 +181,7 @@ MonoBehaviour:
 
     Title
 
-    Spooky Tune Jam 2023'
+    Album'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 0caabae80c4dac04992ded6df09895b5, type: 2}
   m_sharedMaterial: {fileID: -3817065638094833262, guid: 0caabae80c4dac04992ded6df09895b5,
@@ -226,15 +225,17 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 0
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
+  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
+  m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0
@@ -467,6 +468,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 24300002, guid: 16bb2da118f6aee4e87f4c1ea6efa852,
     type: 2}
   m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
@@ -884,7 +886,7 @@ MonoBehaviour:
   frequencyLimitLow: 10
   frequencyLimitHigh: 8000
   loudnessDecaySpeed: 0.5
-  bandDecaySpeed: 3
+  bandDecaySpeed: 4
   audioSource: {fileID: 1073279696}
   barManager: {fileID: 1561388118}
   playGraphic: {fileID: 780083618}
@@ -928,8 +930,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e299b0eb6398a01448d00ed3542ab86a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  colorMin: {r: 0.33578205, g: 0, b: 1, a: 1}
-  colorMax: {r: 0, g: 1, b: 0.3864882, a: 1}
+  colorMin: {r: 0.8018868, g: 0, b: 0.3288312, a: 1}
+  colorMax: {r: 1, g: 0.69559526, b: 0, a: 1}
   angularSpeed: 5
   xMinScale: 120
   xMaxScale: 200
@@ -1023,7 +1025,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.95, g: 0.45452583, b: 0.073706865, a: 1}
+  m_Color: {r: 0.32156864, g: 0.3019608, b: 0.2784314, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1

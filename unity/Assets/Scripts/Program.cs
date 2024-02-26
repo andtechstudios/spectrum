@@ -58,6 +58,8 @@ public class Program : MonoBehaviour
 	[SerializeField]
 	private TMP_Text chryonText;
 
+	private const string album = "Spring Tune Jam 2024";
+
 	// Storage
 	private Config config;
 	private Sampler sampler;
@@ -91,7 +93,7 @@ public class Program : MonoBehaviour
 		var text = string.Empty;
 		text = string.IsNullOrEmpty(config.artist) ? text : text + $"{config.artist}";
 		text = string.IsNullOrEmpty(config.title) ? text : text + $"\n\"{config.title}\"";
-		text += "\nSpooky Tune Jam 2023";
+		text += $"\n{album}";
 		chryonText.text = text;
 
 		yield return LoadAudioAsync();
